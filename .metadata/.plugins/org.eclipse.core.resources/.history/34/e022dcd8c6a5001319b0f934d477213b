@@ -1,0 +1,5 @@
+package edu.mines.letschat;
+
+public class TextCapitalizeResultReceiver {
+
+}

@@ -1,0 +1,16 @@
+package edu.mines.letschat;
+
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+
+public class TextCapitalizeResultReceiver extends BroadcastReceiver {
+
+	public final static String ACTION_TEXT_CAPITALIZED= "com.android.guide.exampleintentservice.intent.action.ACTION_TEXT_CAPITALIZED";
+	@Override
+	public void onReceive(Context context, Intent intent) {
+		String resultText =intent.getStringExtra(GcmIntentService.OUTPUT_TEXT);
+		textViewResult.setText(resultText);
+	}
+
+}
