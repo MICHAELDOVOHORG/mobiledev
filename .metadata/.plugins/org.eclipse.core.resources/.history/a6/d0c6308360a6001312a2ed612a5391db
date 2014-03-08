@@ -331,7 +331,6 @@ public class MainActivity extends Activity {
     		List<NameValuePair> params = new ArrayList<NameValuePair>(1);
     		params.add(new BasicNameValuePair("func", FUNCTION));
     		params.add(new BasicNameValuePair("deviceKey", regid));
-    		params.add(new BasicNameValuePair("username", username));
     		try {
     			httpPost.setEntity(new UrlEncodedFormEntity(params));
     			response = httpClient.execute(httpPost);

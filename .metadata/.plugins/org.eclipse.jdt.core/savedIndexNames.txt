@@ -6,7 +6,6 @@ INDEX VERSION 1.126+C:\Users\David\Desktop\MobileDev\.metadata\.plugins\org.ecli
 3637429329.index
 3793084308.index
 624034946.index
-4084396449.index
 822362410.index
 100305277.index
 2349628572.index
@@ -23,7 +22,6 @@ INDEX VERSION 1.126+C:\Users\David\Desktop\MobileDev\.metadata\.plugins\org.ecli
 2064485707.index
 4212504174.index
 536429932.index
-2801054007.index
 2412008697.index
 872191384.index
 848856923.index

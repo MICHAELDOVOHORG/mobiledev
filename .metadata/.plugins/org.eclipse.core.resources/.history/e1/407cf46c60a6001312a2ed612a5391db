@@ -74,7 +74,6 @@ public class MainActivity extends Activity {
     public static final String EXTRA_USER_NAME = "edu.mines.letschat.EXTRA_USER_NAME";
     public static final String EXTRA_DEVICE_ID = "edu.mines.letschat.EXTRA_DEVICE_ID";
     public static final String EXTRA_SENDER_ID = "edu.mines.letschat.EXTRA_SENDER_ID";
-    public String username;
     private ArrayList<String> users = new ArrayList<String>();
     public HashMap<String, String> map;
 
@@ -104,7 +103,6 @@ public class MainActivity extends Activity {
 //        mDisplay = (TextView) findViewById(R.id.display);
 
         context = getApplicationContext();
-        username = getIntent().getStringExtra(LoginActivity.EXTRA_LOGIN);
 
         // Check device for Play Services APK. If check succeeds, proceed with GCM registration.
         if (checkPlayServices()) {
@@ -331,7 +329,6 @@ public class MainActivity extends Activity {
     		List<NameValuePair> params = new ArrayList<NameValuePair>(1);
     		params.add(new BasicNameValuePair("func", FUNCTION));
     		params.add(new BasicNameValuePair("deviceKey", regid));
-    		params.add(new BasicNameValuePair("username", username));
     		try {
     			httpPost.setEntity(new UrlEncodedFormEntity(params));
     			response = httpClient.execute(httpPost);
