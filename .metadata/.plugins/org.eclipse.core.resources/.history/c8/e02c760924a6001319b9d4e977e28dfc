@@ -1,7 +1,0 @@
-package edu.mines.letschat;
-
-import com.orm.SugarRecord;
-
-public class Conversation extends SugarRecord<Conversation> {
-
-}
