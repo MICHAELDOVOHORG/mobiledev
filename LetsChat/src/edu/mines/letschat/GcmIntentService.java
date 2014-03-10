@@ -18,15 +18,8 @@ package edu.mines.letschat;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import com.google.android.gms.gcm.GoogleCloudMessaging;
-import com.google.android.gms.internal.ex;
-import com.orm.dsl.Collection;
-
 import android.app.IntentService;
-import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -34,7 +27,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.SystemClock;
-import android.os.Vibrator;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
@@ -73,9 +65,9 @@ public class GcmIntentService extends IntentService {
              * not interested in, or that you don't recognize.
              */
             if (GoogleCloudMessaging.MESSAGE_TYPE_SEND_ERROR.equals(messageType)) {
-                sendNotification("Send error: " + extras.toString());
+                sendNotification("Send error: " + extras.toString(), "0");
             } else if (GoogleCloudMessaging.MESSAGE_TYPE_DELETED.equals(messageType)) {
-                sendNotification("Deleted messages on server: " + extras.toString());
+                sendNotification("Deleted messages on server: " + extras.toString(), "0");
             // If it's a regular GCM message, do some work.
             } else if (GoogleCloudMessaging.MESSAGE_TYPE_MESSAGE.equals(messageType)) {
                 // This loop represents the service doing some work.
@@ -89,14 +81,13 @@ public class GcmIntentService extends IntentService {
 //                }
                 Log.i(TAG, "Completed work @ " + SystemClock.elapsedRealtime());
                 // Post notification of received message.
-//                sendNotification("Received: " + extras.toString());
                 
                 String message = (String) extras.get("message");
                 messages.add(message);
                 
-                sendNotification(message);
                 String senderID = (String) extras.get("sender");
                 String recipientID = (String) extras.get("recipient");
+                sendNotification(message, senderID);
                 Log.v(TAG, "Received: " + message);
                 
                 Log.i(TAG, "Received: " + extras.toString());
@@ -123,6 +114,7 @@ public class GcmIntentService extends IntentService {
     {
     	Intent resultBroadCastIntent = new Intent();
     	resultBroadCastIntent.setAction("deletion");
+    	resultBroadCastIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
     	resultBroadCastIntent.addCategory(Intent.CATEGORY_DEFAULT);
     	sendBroadcast(resultBroadCastIntent);
     	return PendingIntent.getBroadcast(getBaseContext(), 0, resultBroadCastIntent, PendingIntent.FLAG_CANCEL_CURRENT);
@@ -131,14 +123,15 @@ public class GcmIntentService extends IntentService {
     // Put the message into a notification and post it.
     // This is just one simple example of what you might choose to do with
     // a GCM message.
-    private void sendNotification(String msg) {
+    private void sendNotification(String msg, String senderID) {
         mNotificationManager = (NotificationManager)
                 this.getSystemService(Context.NOTIFICATION_SERVICE);
 
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.putExtra(MainActivity.EXTRA_NOTIFICATION_RETRIEVE, senderID);
+        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
-                new Intent(this, MainActivity.class), 0);
-
-        long[] pattern = {1000};
+                intent, PendingIntent.FLAG_UPDATE_CURRENT);
         
         notificationCounter++;
         
@@ -149,8 +142,8 @@ public class GcmIntentService extends IntentService {
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
         .setVibrate(new long[] { 0, 500, 250, 500, 250 })
-        .setLights(Color.RED, 200, 200)
-        .setSmallIcon(R.drawable.ic_launcher)
+        .setLights(Color.BLUE, 200, 200)
+        .setSmallIcon(R.drawable.logo)
         .setContentTitle("Let's Chat Notification")
         .setStyle(new NotificationCompat.BigTextStyle()
         .bigText(msg))
@@ -162,8 +155,6 @@ public class GcmIntentService extends IntentService {
         // Sets a title for the Inbox style big view
         inboxStyle.setBigContentTitle("Unread messages (" + notificationCounter + "):");
         // Moves events into the big view
-//        Collections.reverse(messages);
-        int start = messages.size() - 1;
         ArrayList<String> temp = new ArrayList<String>();
         for (int i = 0; i < 5; ++i) {
         	if (i == messages.size()) {
@@ -181,7 +172,6 @@ public class GcmIntentService extends IntentService {
         
         mBuilder.setAutoCancel(true);
         mBuilder.setContentIntent(contentIntent);
-//        NOTIFICATION_ID++;
         mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
     }
 }
