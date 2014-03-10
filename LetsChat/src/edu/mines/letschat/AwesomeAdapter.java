@@ -8,6 +8,8 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.BaseAdapter;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
@@ -15,23 +17,24 @@ import android.widget.TextView;
 public class AwesomeAdapter extends BaseAdapter {
 	private Context mContext;
 	private ArrayList<Message> mMessages;
+	public static boolean animate = false;
 
 	public AwesomeAdapter(Context context, ArrayList<Message> messages) {
 		super();
 		this.mContext = context;
 		this.mMessages = messages;
 	}
-	
+
 	@Override
 	public int getCount() {
 		return mMessages.size();
 	}
-	 
+
 	@Override
 	public Object getItem(int position) {		
 		return mMessages.get(position);
 	}
-	 
+
 	@SuppressLint("ResourceAsColor")
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
@@ -52,31 +55,43 @@ public class AwesomeAdapter extends BaseAdapter {
 
 		LayoutParams lp = (LayoutParams) holder.message.getLayoutParams();
 		//check if it is a status message then remove background, and change text color.
-//		if(message.isStatusMessage())
-//		{
-//			holder.message.setBackgroundDrawable(null);
-//			lp.gravity = Gravity.LEFT;
-//			holder.message.setTextColor(R.color.textFieldColor);
-//		}
-//		else
-//		{		
-//			//Check whether message is mine to show green background and align to right
-			if(message.isMine())
-			{
-				holder.message.setBackgroundResource(R.drawable.speech_bubble_green);
-				lp.gravity = Gravity.RIGHT;
+		//		if(message.isStatusMessage())
+		//		{
+		//			holder.message.setBackgroundDrawable(null);
+		//			lp.gravity = Gravity.LEFT;
+		//			holder.message.setTextColor(R.color.textFieldColor);
+		//		}
+		//		else
+		//		{		
+		//			//Check whether message is mine to show green background and align to right
+		if(message.isMine())
+		{
+			holder.message.setBackgroundResource(R.drawable.speech_bubble_green);
+			lp.gravity = Gravity.RIGHT;
+		}
+		//If not mine then it is from sender to show orange background and align to left
+		else
+		{
+			holder.message.setBackgroundResource(R.drawable.speech_bubble_orange);
+			lp.gravity = Gravity.LEFT;
+		}
+		holder.message.setLayoutParams(lp);
+		holder.message.setTextColor(R.color.textColor);	
+		//		}
+		if (animate) {
+			if (position == mMessages.size() - 1 && mMessages.get(mMessages.size() - 1).isMine()) {
+				Animation animation = AnimationUtils.loadAnimation(mContext, android.R.anim.slide_in_left);
+				convertView.startAnimation(animation);
 			}
-			//If not mine then it is from sender to show orange background and align to left
-			else
-			{
-				holder.message.setBackgroundResource(R.drawable.speech_bubble_orange);
-				lp.gravity = Gravity.LEFT;
+			
+			if (position == mMessages.size() - 1 && !mMessages.get(mMessages.size() - 1).isMine()) {
+				Animation animation = AnimationUtils.loadAnimation(mContext, R.anim.slide_in_right);
+				convertView.startAnimation(animation);
 			}
-			holder.message.setLayoutParams(lp);
-			holder.message.setTextColor(R.color.textColor);	
-//		}
+		}
 		return convertView;
 	}
+	
 	private static class ViewHolder
 	{
 		TextView message;

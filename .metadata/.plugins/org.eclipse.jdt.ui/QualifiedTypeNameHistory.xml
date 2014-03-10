@@ -1,14 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <qualifiedTypeNameHistroy>
-<fullyQualifiedTypeName name="org.json.JSONObject"/>
-<fullyQualifiedTypeName name="org.apache.http.client.ClientProtocolException"/>
-<fullyQualifiedTypeName name="org.json.JSONException"/>
-<fullyQualifiedTypeName name="java.io.InputStreamReader"/>
-<fullyQualifiedTypeName name="java.io.BufferedReader"/>
-<fullyQualifiedTypeName name="edu.mines.letschat.MainActivity.LoadEvents"/>
-<fullyQualifiedTypeName name="android.widget.ListAdapter"/>
-<fullyQualifiedTypeName name="android.widget.SimpleAdapter"/>
-<fullyQualifiedTypeName name="android.R"/>
 <fullyQualifiedTypeName name="android.R.layout"/>
 <fullyQualifiedTypeName name="android.widget.AdapterView.OnItemClickListener"/>
 <fullyQualifiedTypeName name="edu.mines.letschat.MainActivity.SendNotification"/>
@@ -28,8 +19,6 @@
 <fullyQualifiedTypeName name="edu.mines.letschat.Conversation"/>
 <fullyQualifiedTypeName name="android.widget.Toast"/>
 <fullyQualifiedTypeName name="java.util.HashMap"/>
-<fullyQualifiedTypeName name="edu.mines.letschat.MessageActivity"/>
-<fullyQualifiedTypeName name="edu.mines.letschat.R.id"/>
 <fullyQualifiedTypeName name="android.os.Vibrator"/>
 <fullyQualifiedTypeName name="android.app.Notification"/>
 <fullyQualifiedTypeName name="android.support.v4.app.NotificationCompat"/>
@@ -50,7 +39,6 @@
 <fullyQualifiedTypeName name="edu.mines.letschat.R.color"/>
 <fullyQualifiedTypeName name="edu.mines.letschat.AwesomeAdapter"/>
 <fullyQualifiedTypeName name="edu.mines.letschat.Message"/>
-<fullyQualifiedTypeName name="android.widget.EditText"/>
 <fullyQualifiedTypeName name="android.view.View"/>
 <fullyQualifiedTypeName name="edu.mines.letschat.LoginActivity"/>
 <fullyQualifiedTypeName name="org.apache.http.message.BasicNameValuePair"/>
@@ -59,5 +47,17 @@
 <fullyQualifiedTypeName name="edu.mines.letschat.MainActivity.TextCapitalizeResultReceiver2"/>
 <fullyQualifiedTypeName name="android.app.PendingIntent"/>
 <fullyQualifiedTypeName name="java.util.Map.Entry"/>
+<fullyQualifiedTypeName name="edu.mines.letschat.MainActivity.OnTaskCompleted"/>
 <fullyQualifiedTypeName name="edu.mines.letschat.MainActivity"/>
+<fullyQualifiedTypeName name="android.text.TextWatcher"/>
+<fullyQualifiedTypeName name="android.widget.Button"/>
+<fullyQualifiedTypeName name="edu.mines.letschat.R.id"/>
+<fullyQualifiedTypeName name="android.app.ProgressDialog"/>
+<fullyQualifiedTypeName name="java.lang.Runnable"/>
+<fullyQualifiedTypeName name="android.widget.EditText"/>
+<fullyQualifiedTypeName name="android.os.Handler"/>
+<fullyQualifiedTypeName name="android.app.Dialog"/>
+<fullyQualifiedTypeName name="android.view.animation.Animation"/>
+<fullyQualifiedTypeName name="android.view.animation.AnimationUtils"/>
+<fullyQualifiedTypeName name="edu.mines.letschat.MessageActivity"/>
 </qualifiedTypeNameHistroy>

@@ -18,6 +18,7 @@ import org.apache.http.message.BasicNameValuePair;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.NotificationManager;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -26,6 +27,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -34,6 +37,7 @@ import android.support.v4.app.NavUtils;
 import android.annotation.TargetApi;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
@@ -47,6 +51,8 @@ public class MessageActivity extends Activity {
 	ListView conversationList;
 	AwesomeAdapter awesome;
 	ArrayList<Message> messages = new ArrayList<Message>();
+	List<Conversation>  listOfConverstations;
+	int toDelete;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +69,40 @@ public class MessageActivity extends Activity {
 		conversationList = (ListView) findViewById(R.id.conversationList);
 		awesome = new AwesomeAdapter(this, messages);
 		conversationList.setAdapter(awesome);
+		conversationList.setOnItemLongClickListener(new OnItemLongClickListener() {
+			@Override
+			public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
+					int arg2, long arg3) {
+				AlertDialog.Builder builder = new AlertDialog.Builder(MessageActivity.this);
+				toDelete = arg2;
+                builder.setTitle("Action:");
+                builder.setItems(new String[] {"Delete"}, new DialogInterface.OnClickListener() {
+
+                    public void onClick(DialogInterface dialog, int item) {
+        				messages.remove(toDelete);
+        				awesome.notifyDataSetChanged();
+        				listOfConverstations.get(toDelete).delete();
+
+//                        new AlertDialog.Builder(MessageActivity.this)
+//                        .setTitle(getString(R.string.delete))
+//                        .setMessage(getString(R.string.remove))
+//                        .setPositiveButton("Done", new DialogInterface.OnClickListener() {
+//                            public void onClick(DialogInterface dialog, int which) { 
+////                                Intent intent = new Intent(CartDetailsActivity.this, HomeScreen.class);
+////                                startActivity(intent);
+//                            }
+//                         })
+//                         .show();
+        				AwesomeAdapter.animate = false;
+                    }
+
+                });
+
+                AlertDialog alert = builder.create();
+                alert.show();
+				return false;
+			}
+		});
 		getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 		Button button = (Button) findViewById(R.id.sendMessage);
 		button.setEnabled(false);
@@ -92,11 +132,11 @@ public class MessageActivity extends Activity {
 	
 	public void populateConversationList() {
 		messages.clear();
-		List<Conversation> listOfConversations = Conversation.findWithQuery(Conversation.class, "SELECT * FROM CONVERSATION WHERE (recipient_id = \"" + recipientID + "\" AND sender_id = \"" + senderID + "\")" +
+		listOfConverstations = Conversation.findWithQuery(Conversation.class, "SELECT * FROM CONVERSATION WHERE (recipient_id = \"" + recipientID + "\" AND sender_id = \"" + senderID + "\")" +
 				" OR (recipient_id = \"" + senderID + "\" AND sender_id = \"" + recipientID + "\");");
 		
-		Log.v(TAG, listOfConversations.size() + "");
-		for (Conversation c : listOfConversations) {
+		Log.v(TAG, listOfConverstations.size() + "");
+		for (Conversation c : listOfConverstations) {
 			messages.add(new Message(c.message, c.sent));
 		}
 		AwesomeAdapter ad = (AwesomeAdapter) conversationList.getAdapter();
@@ -126,6 +166,7 @@ public class MessageActivity extends Activity {
 	public void sendMessage(View v) {
 		EditText et = (EditText) findViewById(R.id.typingArea);
 		String message = et.getText().toString();
+		AwesomeAdapter.animate = true;
 		new SendNotification(recipientID, message).execute();
 	}
 	
@@ -147,6 +188,7 @@ public class MessageActivity extends Activity {
     		@Override
     		public void onReceive(Context context, Intent intent) {
 //    			String resultText =intent.getStringExtra(GcmIntentService.OUTPUT_TEXT);
+    			AwesomeAdapter.animate = true;
     			populateConversationList();
     			GcmIntentService.messages.clear();
     	    	GcmIntentService.notificationCounter = 0;
