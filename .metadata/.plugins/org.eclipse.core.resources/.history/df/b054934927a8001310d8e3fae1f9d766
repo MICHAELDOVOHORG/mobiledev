@@ -31,11 +31,13 @@ import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.support.v4.app.NavUtils;
 import android.annotation.TargetApi;
 import android.content.BroadcastReceiver;
@@ -80,23 +82,6 @@ public class MessageActivity extends Activity {
 	            R.anim.slide_out_left);
 		animation = AnimationUtils.loadAnimation(this,
 	            android.R.anim.slide_out_right);
-		animationLeft.setAnimationListener(new AnimationListener() {
-	        @Override
-	        public void onAnimationStart(Animation animation) {
-	        }
-
-	        @Override
-	        public void onAnimationRepeat(Animation animation) {
-	        }
-
-	        @Override
-	        public void onAnimationEnd(Animation animation) {
-	            awesome.remove(toDelete);
-	            awesome.notifyDataSetChanged();
-	            listOfConverstations.get(toDelete).delete();
-	        }
-	    });
-		
 		animation.setAnimationListener(new AnimationListener() {
 	        @Override
 	        public void onAnimationStart(Animation animation) {
@@ -138,10 +123,10 @@ public class MessageActivity extends Activity {
 
                     public void onClick(DialogInterface dialog, int item) {
                     	if (messages.get(toDelete).isMine()) {
-                    		deleteView.startAnimation(animationLeft);
-                    	} else {
-                    		deleteView.startAnimation(animation);
+                    		animation = animationLeft;
                     	}
+                    	deleteView.startAnimation(animation);
+//        				messages.remove(toDelete);
 
 //                        new AlertDialog.Builder(MessageActivity.this)
 //                        .setTitle(getString(R.string.delete))

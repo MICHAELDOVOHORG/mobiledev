@@ -31,11 +31,13 @@ import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.support.v4.app.NavUtils;
 import android.annotation.TargetApi;
 import android.content.BroadcastReceiver;
@@ -138,10 +140,10 @@ public class MessageActivity extends Activity {
 
                     public void onClick(DialogInterface dialog, int item) {
                     	if (messages.get(toDelete).isMine()) {
-                    		deleteView.startAnimation(animationLeft);
-                    	} else {
-                    		deleteView.startAnimation(animation);
+                    		animation = animationLeft;
                     	}
+                    	deleteView.startAnimation(animation);
+//        				messages.remove(toDelete);
 
 //                        new AlertDialog.Builder(MessageActivity.this)
 //                        .setTitle(getString(R.string.delete))

@@ -24,10 +24,6 @@ public class AwesomeAdapter extends BaseAdapter {
 		this.mContext = context;
 		this.mMessages = messages;
 	}
-	
-	public void remove (int position) {
-		mMessages.remove(position);
-	}
 
 	@Override
 	public int getCount() {
