@@ -1,0 +1,106 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:baselineAligned="false"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:background="@drawable/backtoschool"
+    tools:context=".AddSemesterActivity" >
+
+    <LinearLayout
+        android:id="@+id/left"
+        android:layout_width="0dp"
+        android:layout_height="fill_parent"
+        android:layout_weight=".25"
+        android:orientation="vertical" >
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/center"
+        android:layout_width="0dp"
+        android:layout_height="fill_parent"
+        android:layout_weight=".5"
+        android:orientation="vertical" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textColor="#FFFFFF"
+            android:text="@string/addsemesterlabel" />
+
+        <RadioGroup
+            android:id="@+id/radioGroup1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center" >
+
+            <RadioButton
+                android:id="@+id/radio0"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:textColor="#FFFFFF"
+                android:text="@string/spring" />
+
+            <RadioButton
+                android:id="@+id/radio1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#FFFFFF"
+                android:text="@string/fall" />
+
+            <RadioButton
+                android:id="@+id/radio2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#FFFFFF"
+                android:text="@string/summer" />
+
+            <RadioButton
+                android:id="@+id/radio3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#FFFFFF"
+                android:text="@string/winter" />
+        </RadioGroup>
+
+        <EditText
+            android:id="@+id/othersemester"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#FFFFFF"
+            android:hint="@string/other" />
+
+        <EditText
+            android:id="@+id/semesteryear"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textColorHint="#FFFFFF"
+            android:textColor="#FFFFFF"
+            android:hint="@string/year" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/submit" 
+            android:onClick="addSemester"/>
+    </LinearLayout>
+    
+    <LinearLayout
+        android:id="@+id/right"
+        android:layout_width="0dp"
+        android:layout_height="fill_parent"
+        android:layout_weight=".25"
+        android:orientation="vertical" >
+    </LinearLayout>
+
+</LinearLayout>

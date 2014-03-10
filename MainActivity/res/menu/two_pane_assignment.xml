@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+    <item 
+        android:id="@+id/addCourseContext" 
+        android:title="@string/menu_add_course"></item>
+    
+    <item 
+        android:id="@+id/addAssignmentContext" 
+        android:title="@string/menu_add_assignment"></item>
+    
+    <item 
+        android:id="@+id/setting" 
+        android:title="@string/setting"></item>
+    
+    <item 
+        android:id="@+id/help" 
+        android:title="@string/help"></item>
+    
+    <item 
+        android:id="@+id/about" 
+        android:title="@string/about"></item>
+    
+    <item
+        android:id="@+id/action_user"
+        android:icon="@drawable/door"
+        android:title="@string/action_user"
+        android:showAsAction="ifRoom" />
+    
+</menu>
