@@ -64,8 +64,6 @@ public class MessageActivity extends Activity {
 		awesome = new AwesomeAdapter(this, messages);
 		conversationList.setAdapter(awesome);
 		getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
-		Button button = (Button) findViewById(R.id.sendMessage);
-		button.setEnabled(false);
 		EditText et = (EditText) findViewById(R.id.typingArea);
 		et.addTextChangedListener(new TextWatcher() {
 			

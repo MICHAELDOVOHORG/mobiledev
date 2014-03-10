@@ -12,36 +12,28 @@
         android:id="@+id/conversationWith"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
-
-    <LinearLayout
-        android:id="@+id/sendArea"
+    
+    <EditText
+        android:id="@+id/typingArea"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:orientation="horizontal" >
-
-        <EditText
-            android:id="@+id/typingArea"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight=".75"
-            android:hint="@string/entertext"
-            android:inputType="textMultiLine" />
-
-        <Button
-            android:id="@+id/sendMessage"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight=".25"
-            android:onClick="sendMessage"
-            android:text="@string/send" />
-    </LinearLayout>
-
+        android:inputType="textMultiLine"
+        android:hint="Enter Text"
+        android:layout_alignParentBottom="true" />
+    
+    <Button
+        android:id="@+id/sendMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/typingArea"
+        android:onClick="sendMessage"
+        android:text="Send" />
+    
     <ListView
         android:id="@+id/conversationList"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@id/sendArea"
-        android:layout_below="@id/conversationWith" />
+        android:layout_below="@id/conversationWith"
+        android:layout_above="@id/sendMessage" />
 
 </RelativeLayout>

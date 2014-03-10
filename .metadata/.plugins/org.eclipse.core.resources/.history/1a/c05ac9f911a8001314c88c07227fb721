@@ -19,14 +19,11 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Activity;
 import android.app.NotificationManager;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -58,40 +55,22 @@ public class MessageActivity extends Activity {
 		recipientID = getIntent().getStringExtra(MainActivity.EXTRA_DEVICE_ID);
 		senderID = getIntent().getStringExtra(MainActivity.EXTRA_SENDER_ID);
 		userName = getIntent().getStringExtra(MainActivity.EXTRA_USER_NAME);
+//		Log.v(TAG, recipientID);
+//		Log.v(TAG, senderID);
+//		Log.v(TAG, userName);
 		TextView tv = (TextView) findViewById(R.id.conversationWith);
 		tv.setText("Conversation with " + userName);
 		conversationList = (ListView) findViewById(R.id.conversationList);
 		awesome = new AwesomeAdapter(this, messages);
 		conversationList.setAdapter(awesome);
 		getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
-		Button button = (Button) findViewById(R.id.sendMessage);
-		button.setEnabled(false);
-		EditText et = (EditText) findViewById(R.id.typingArea);
-		et.addTextChangedListener(new TextWatcher() {
-			
-			@Override
-			public void onTextChanged(CharSequence s, int start, int before, int count) {
-				if (s.length() > 0) {
-					Button button = (Button) findViewById(R.id.sendMessage);
-					button.setEnabled(true);
-				}
-			}
-			
-			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count,
-					int after) {
-				Button button = (Button) findViewById(R.id.sendMessage);
-				button.setEnabled(false);
-			}
-			
-			@Override
-			public void afterTextChanged(Editable arg0) {
-			}
-		});
 	}
 	
 	public void populateConversationList() {
+//		List<Conversation> listOfConversations = Conversation.findWithQuery(Conversation.class, "Select * FROM CONVERSATION;");
+//		listOfConversations.size();
 		messages.clear();
+//		List<Conversation> listOfConversations = Conversation.find(Conversation.class, "recipient_id = ?", recipientID);
 		List<Conversation> listOfConversations = Conversation.findWithQuery(Conversation.class, "SELECT * FROM CONVERSATION WHERE (recipient_id = \"" + recipientID + "\" AND sender_id = \"" + senderID + "\")" +
 				" OR (recipient_id = \"" + senderID + "\" AND sender_id = \"" + recipientID + "\");");
 		
@@ -127,6 +106,7 @@ public class MessageActivity extends Activity {
 		EditText et = (EditText) findViewById(R.id.typingArea);
 		String message = et.getText().toString();
 		new SendNotification(recipientID, message).execute();
+//		populateConversationList();
 	}
 	
 	private void registerReceiver() {

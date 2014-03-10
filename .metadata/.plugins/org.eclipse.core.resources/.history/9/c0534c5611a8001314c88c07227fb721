@@ -25,7 +25,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight=".75"
-            android:hint="@string/entertext"
+            android:hint="Enter Text"
             android:inputType="textMultiLine" />
 
         <Button
@@ -33,8 +33,9 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight=".25"
+            android:layout_above="@id/typingArea"
             android:onClick="sendMessage"
-            android:text="@string/send" />
+            android:text="Send" />
     </LinearLayout>
 
     <ListView
