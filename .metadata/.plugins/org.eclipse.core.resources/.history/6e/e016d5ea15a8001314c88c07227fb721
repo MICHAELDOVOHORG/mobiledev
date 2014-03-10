@@ -19,6 +19,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Activity;
 import android.app.NotificationManager;
+import android.app.ProgressDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -47,6 +48,7 @@ public class MessageActivity extends Activity {
 	ListView conversationList;
 	AwesomeAdapter awesome;
 	ArrayList<Message> messages = new ArrayList<Message>();
+	ProgressDialog progressBar;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -202,6 +204,24 @@ public class MessageActivity extends Activity {
     	}
     	
     	@Override
+    	protected void onPreExecute() {
+    		progressBar = new ProgressDialog(MessageActivity.this);
+			progressBar.setCancelable(false);
+			progressBar.setMessage("File downloading ...");
+			progressBar.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+			progressBar.setProgress(0);
+			progressBar.setMax(100);
+			progressBar.show();
+			runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					Button button = (Button) findViewById(R.id.sendMessage);
+					button.setEnabled(false);
+				}
+			});
+    	}
+    	
+    	@Override
     	protected String doInBackground(String... arg0) {
     		HttpClient httpClient = new DefaultHttpClient();
     		HttpPost httpPost = new HttpPost(API);
@@ -216,7 +236,6 @@ public class MessageActivity extends Activity {
     		try {
     			httpPost.setEntity(new UrlEncodedFormEntity(params));
     			response = httpClient.execute(httpPost);
-
     			HttpEntity entity = response.getEntity();
 
     			if (entity != null) {
@@ -269,7 +288,6 @@ public class MessageActivity extends Activity {
     	
     	@Override
     	protected void onPostExecute (String file_url) {
-//    		progressBar.dismiss();
     	}
     	
     	public String convert(InputStream is) {

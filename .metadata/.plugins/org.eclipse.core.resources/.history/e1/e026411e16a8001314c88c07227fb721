@@ -17,8 +17,10 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.app.Activity;
 import android.app.NotificationManager;
+import android.app.ProgressDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -47,6 +49,8 @@ public class MessageActivity extends Activity {
 	ListView conversationList;
 	AwesomeAdapter awesome;
 	ArrayList<Message> messages = new ArrayList<Message>();
+	ProgressDialog progressBar;
+	private Handler progressBarHandler = new Handler();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -195,10 +199,29 @@ public class MessageActivity extends Activity {
     	private static final String API = "http://justacomputerscientist.com/mobile/api.php";
     	private String recipientID;
     	private String message;
+    	private int progress;
     	
     	public SendNotification(String recipientID, String message) {
     		this.recipientID = recipientID;
     		this.message = message;
+    	}
+    	
+    	@Override
+    	protected void onPreExecute() {
+    		progressBar = new ProgressDialog(MessageActivity.this);
+			progressBar.setCancelable(false);
+			progressBar.setMessage("File downloading ...");
+			progressBar.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+			progressBar.setProgress(0);
+			progressBar.setMax(100);
+			progressBar.show();
+			runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					Button button = (Button) findViewById(R.id.sendMessage);
+					button.setEnabled(false);
+				}
+			});
     	}
     	
     	@Override
@@ -216,7 +239,15 @@ public class MessageActivity extends Activity {
     		try {
     			httpPost.setEntity(new UrlEncodedFormEntity(params));
     			response = httpClient.execute(httpPost);
-
+    			
+    			progress++;
+    			
+    			progressBarHandler.post(new Runnable() {
+					public void run() {
+					  progressBar.setProgress(progress);
+					}
+				});
+    			
     			HttpEntity entity = response.getEntity();
 
     			if (entity != null) {
@@ -269,7 +300,6 @@ public class MessageActivity extends Activity {
     	
     	@Override
     	protected void onPostExecute (String file_url) {
-//    		progressBar.dismiss();
     	}
     	
     	public String convert(InputStream is) {

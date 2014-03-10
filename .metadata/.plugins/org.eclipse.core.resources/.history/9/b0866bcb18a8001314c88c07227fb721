@@ -148,7 +148,6 @@ public class GcmIntentService extends IntentService {
         .setStyle(new NotificationCompat.BigTextStyle()
         .bigText(msg))
         .setNumber(notificationCounter)
-        .setTicker(msg)
         .setContentText(msg);
         
         NotificationCompat.InboxStyle inboxStyle =

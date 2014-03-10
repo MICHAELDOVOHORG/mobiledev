@@ -216,7 +216,6 @@ public class MessageActivity extends Activity {
     		try {
     			httpPost.setEntity(new UrlEncodedFormEntity(params));
     			response = httpClient.execute(httpPost);
-
     			HttpEntity entity = response.getEntity();
 
     			if (entity != null) {
@@ -269,7 +268,6 @@ public class MessageActivity extends Activity {
     	
     	@Override
     	protected void onPostExecute (String file_url) {
-//    		progressBar.dismiss();
     	}
     	
     	public String convert(InputStream is) {
