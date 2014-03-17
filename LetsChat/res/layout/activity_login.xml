@@ -8,17 +8,23 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".LoginActivity" >
 
-    <EditText
-        android:id="@+id/login"
+    <Button
+        android:id="@+id/signup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:hint="User Name" />
+        android:layout_centerHorizontal="true"
+        android:width="128dp"
+        android:layout_centerVertical="true"
+        android:text="@string/signup"
+        android:onClick="register" />
     
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/login"
-        android:text="Register"
-        android:onClick="register" />
+        android:text="@string/login"
+        android:width="128dp"
+        android:layout_below="@id/signup"
+        android:layout_centerHorizontal="true"
+        android:onClick="login" />
 
 </RelativeLayout>

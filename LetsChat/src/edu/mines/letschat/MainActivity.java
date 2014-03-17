@@ -19,6 +19,8 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import android.app.Activity;
+import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -26,6 +28,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -41,6 +44,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -68,7 +72,8 @@ public class MainActivity extends Activity {
 	public static final String EXTRA_DEVICE_ID = "edu.mines.letschat.EXTRA_DEVICE_ID";
 	public static final String EXTRA_SENDER_ID = "edu.mines.letschat.EXTRA_SENDER_ID";
 	public static final String EXTRA_NOTIFICATION_RETRIEVE = "edu.mines.letschat.EXTRA_NOTIFICATION_RETRIEVE";
-	public String username;
+	private static SharedPreferences sharedPref;
+	public String username, password;
 	private ArrayList<String> users = new ArrayList<String>();
 	public HashMap<String, String> map;
 	static final String TAG = "GCM Demo";
@@ -78,7 +83,7 @@ public class MainActivity extends Activity {
 	AtomicInteger msgId = new AtomicInteger();
 	Context context;
 
-	String regid;
+	static String regid;
 
 	@Override
 	public void onNewIntent(Intent intent){
@@ -108,8 +113,16 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
+		sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+
+		if (!sharedPref.getBoolean("loggedIn", false)) {
+			Intent intent = new Intent(this, LoginActivity.class);
+			startActivity(intent);
+		}
+
 		context = getApplicationContext();
 		username = getIntent().getStringExtra(LoginActivity.EXTRA_LOGIN);
+		password = getIntent().getStringExtra(LoginActivity.EXTRA_PASSWORD);
 
 		// Check device for Play Services APK. If check succeeds, proceed with GCM registration.
 		if (checkPlayServices()) {
@@ -137,6 +150,10 @@ public class MainActivity extends Activity {
 		super.onResume();
 		// Check device for Play Services APK.
 		checkPlayServices();
+		if (!sharedPref.getBoolean("loggedIn", false)) {
+			Intent intent = new Intent(this, LoginActivity.class);
+			startActivity(intent);
+		}
 	}
 
 	/**
@@ -185,7 +202,7 @@ public class MainActivity extends Activity {
 		}
 		return registrationId;
 	}
-	
+
 	/**
 	 * @return Application's version code from the {@code PackageManager}.
 	 */
@@ -199,7 +216,7 @@ public class MainActivity extends Activity {
 			throw new RuntimeException("Could not get package name: " + e);
 		}
 	}
-	
+
 	/**
 	 * @return Application's {@code SharedPreferences}.
 	 */
@@ -217,17 +234,23 @@ public class MainActivity extends Activity {
 	 * shared preferences.
 	 */
 	private void registerInBackground() {
-		new RegisterInBackgroundTask(gcm, context, regid, username, new OnTaskCompleted() {
-			@Override
-			public void onTaskCompleted() {
-				new GetUsers(new OnTaskCompleted() {
-					@Override
-					public void onTaskCompleted() {
-						onNewIntent(getIntent());
-					}
-				}).execute();
-			}
-		}).execute();
+		try {
+			regid = new RegisterInBackgroundTask(gcm, MainActivity.this, regid, username, password, new OnTaskCompleted() {
+				@Override
+				public void onTaskCompleted() {
+					new GetUsers(new OnTaskCompleted() {
+						@Override
+						public void onTaskCompleted() {
+							onNewIntent(getIntent());
+						}
+					}).execute();
+				}
+			}).execute().get();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		}
 	}
 
 	//    // Send an upstream message.
@@ -271,9 +294,18 @@ public class MainActivity extends Activity {
 		private static final String FUNCTION = "getAllUsers";
 		private static final String API = "http://justacomputerscientist.com/mobile/api.php";
 		private OnTaskCompleted listener;
+		ProgressDialog dialog;
 
 		public GetUsers(OnTaskCompleted listener) {
 			this.listener = listener;
+		}
+		
+		@Override
+	    protected void onPreExecute() {
+			dialog = new ProgressDialog(MainActivity.this);
+			dialog.setCancelable(false);
+			dialog.setMessage("Getting users please wait...");
+			dialog.show();
 		}
 
 		@Override
@@ -323,6 +355,7 @@ public class MainActivity extends Activity {
 
 		@Override
 		protected void onPostExecute (String file_url) {
+			dialog.dismiss();
 			ListView lv = (ListView) findViewById(R.id.list);
 			lv.setAdapter(new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, users));
 			lv.setOnItemClickListener(new OnItemClickListener() {

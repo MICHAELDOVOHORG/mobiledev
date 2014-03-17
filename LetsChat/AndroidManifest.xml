@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="edu.mines.letschat"
-    android:versionCode="4"
-    android:versionName="1.03" >
+    android:versionCode="5"
+    android:versionName="1.1" >
 
     <uses-sdk
         android:minSdkVersion="9"
@@ -55,7 +55,7 @@
             android:permission="com.google.android.c2dm.permission.SEND" >
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
-
+                <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
                 <category android:name="edu.mines.letscat" />
             </intent-filter>
         </receiver>

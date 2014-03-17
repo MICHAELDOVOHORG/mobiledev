@@ -14,13 +14,38 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 
-class RegisterUser extends Task {
-	String regid, username;
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.util.Log;
 
-	public RegisterUser(String function, String regid, String username) {
+class RegisterUser extends Task {
+	String regid, username, password;
+	ProgressDialog dialog;
+	Context context;
+
+	public RegisterUser(String function, String regid, String username, String password) {
 		super(function);
 		this.regid = regid;
 		this.username = username;
+		this.password = password;
+	}
+	
+	public RegisterUser(String function, String regid, String username, String password, Context context) {
+		super(function);
+		this.regid = regid;
+		this.username = username;
+		this.password = password;
+		this.context = context;
+	}
+	
+	@Override
+    protected void onPreExecute() {
+		if (context != null) {
+			dialog = new ProgressDialog(context);
+			dialog.setCancelable(false);
+			dialog.setMessage("Siging up please wait...");
+			dialog.show();
+		}
 	}
 
 	@Override
@@ -34,6 +59,7 @@ class RegisterUser extends Task {
 		params.add(new BasicNameValuePair("func", super.getFunction()));
 		params.add(new BasicNameValuePair("deviceKey", regid));
 		params.add(new BasicNameValuePair("username", username));
+		params.add(new BasicNameValuePair("password", password));
 		try {
 			httpPost.setEntity(new UrlEncodedFormEntity(params));
 			response = httpClient.execute(httpPost);
@@ -43,6 +69,7 @@ class RegisterUser extends Task {
 				InputStream instream = entity.getContent();
 				result = convert(instream);
 				instream.close();
+				Log.v("RESULT", result);
 			}
 		} catch (ClientProtocolException e) {
 			e.printStackTrace();
@@ -51,5 +78,13 @@ class RegisterUser extends Task {
 		}
 
 		return result;
+	}
+	
+	@Override
+	protected void onPostExecute(String msg) {
+//		Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
+		if (context != null) {
+			dialog.dismiss();
+		}
 	}
 }

@@ -15,7 +15,6 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -227,7 +226,7 @@ public class MessageActivity extends Activity {
 		EditText et = (EditText) findViewById(R.id.typingArea);
 		String message = et.getText().toString();
 		AwesomeAdapter.animate = true;
-		new SendNotification(recipientID, message).execute();
+		new SendNotification("sendNotification", recipientID, message).execute();
 	}
 	
 	private void registerReceiver() {
@@ -291,14 +290,13 @@ public class MessageActivity extends Activity {
 		return super.onOptionsItemSelected(item);
 	}
 	
-	class SendNotification extends AsyncTask<String, String, String> {
+	class SendNotification extends Task {
 
-    	private static final String FUNCTION = "sendNotification";
-    	private static final String API = "http://justacomputerscientist.com/mobile/api.php";
     	private String recipientID;
     	private String message;
     	
-    	public SendNotification(String recipientID, String message) {
+    	public SendNotification(String function, String recipientID, String message) {
+    		super(function);
     		this.recipientID = recipientID;
     		this.message = message;
     	}
@@ -306,12 +304,12 @@ public class MessageActivity extends Activity {
     	@Override
     	protected String doInBackground(String... arg0) {
     		HttpClient httpClient = new DefaultHttpClient();
-    		HttpPost httpPost = new HttpPost(API);
+    		HttpPost httpPost = new HttpPost(super.getApi());
     		HttpResponse response;
     		String result = "";
     		
     		List<NameValuePair> params = new ArrayList<NameValuePair>(1);
-    		params.add(new BasicNameValuePair("func", FUNCTION));
+    		params.add(new BasicNameValuePair("func", super.getFunction()));
     		params.add(new BasicNameValuePair("recipient", recipientID));
     		params.add(new BasicNameValuePair("message", message));
     		params.add(new BasicNameValuePair("sender", senderID));

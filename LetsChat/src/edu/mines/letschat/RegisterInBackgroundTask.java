@@ -2,13 +2,14 @@ package edu.mines.letschat;
 
 import java.io.IOException;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.Toast;
 
 public class RegisterInBackgroundTask extends AsyncTask<Void, Void, String>{
 	public static final String PROPERTY_REG_ID = "registration_id";
@@ -19,13 +20,24 @@ public class RegisterInBackgroundTask extends AsyncTask<Void, Void, String>{
 	Context context;
 	String regid, username;
 	OnTaskCompleted listener;
+	String password;
+	ProgressDialog dialog;
 
-	public RegisterInBackgroundTask(GoogleCloudMessaging gcm, Context context, String regid, String username, OnTaskCompleted listener) {
+	public RegisterInBackgroundTask(GoogleCloudMessaging gcm, Context context, String regid, String username, String password, OnTaskCompleted listener) {
 		this.gcm = gcm;
 		this.context = context;
 		this.regid = regid;
 		this.username = username;
 		this.listener = listener;
+		this.password = password;
+	}
+	
+	@Override
+    protected void onPreExecute() {
+		dialog = new ProgressDialog(context);
+		dialog.setCancelable(false);
+		dialog.setMessage("Siging up please wait...");
+		dialog.show();
 	}
 	
 	@Override
@@ -35,6 +47,13 @@ public class RegisterInBackgroundTask extends AsyncTask<Void, Void, String>{
 			if (gcm == null) {
 				gcm = GoogleCloudMessaging.getInstance(context);
 			}
+			
+			final SharedPreferences prefs = getGcmPreferences(context);
+			SharedPreferences.Editor editor = prefs.edit();
+			editor.putString("password", password);
+			editor.putString("username", username);
+			editor.commit();
+			
 			regid = gcm.register(SENDER_ID);
 			msg = "Device registered, registration ID=" + regid;
 
@@ -48,6 +67,7 @@ public class RegisterInBackgroundTask extends AsyncTask<Void, Void, String>{
 
 			// Persist the regID - no need to register again.
 			storeRegistrationId(context, regid);
+//			return regid;
 		} catch (IOException ex) {
 			msg = "Error :" + ex.getMessage();
 			// If there is an error, don't just keep trying to register.
@@ -59,7 +79,8 @@ public class RegisterInBackgroundTask extends AsyncTask<Void, Void, String>{
 
 	@Override
 	protected void onPostExecute(String msg) {
-		Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
+//		Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
+		dialog.dismiss();
 		listener.onTaskCompleted();
 	}
 	
@@ -69,7 +90,7 @@ public class RegisterInBackgroundTask extends AsyncTask<Void, Void, String>{
 	 * to a server that echoes back the message using the 'from' address in the message.
 	 */
 	private void sendRegistrationIdToBackend() {
-		new RegisterUser("registerUser", regid, username).execute();
+		new RegisterUser("registerUser", regid, username, password, context).execute();
 	}
 	
 	/**
