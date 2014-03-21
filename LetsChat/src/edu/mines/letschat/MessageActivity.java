@@ -34,7 +34,6 @@ import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.support.v4.app.NavUtils;
 import android.annotation.TargetApi;
 import android.content.BroadcastReceiver;
@@ -42,6 +41,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Build;
 
 public class MessageActivity extends Activity {
@@ -64,101 +64,101 @@ public class MessageActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_message);
-		// Show the Up button in the action bar.
-		setupActionBar();
-		
+
 		recipientID = getIntent().getStringExtra(MainActivity.EXTRA_DEVICE_ID);
 		senderID = getIntent().getStringExtra(MainActivity.EXTRA_SENDER_ID);
 		userName = getIntent().getStringExtra(MainActivity.EXTRA_USER_NAME);
-		TextView tv = (TextView) findViewById(R.id.conversationWith);
-		tv.setText("Conversation with " + userName);
+//		TextView tv = (TextView) findViewById(R.id.conversationWith);
+//		tv.setText("Conversation with " + userName);
 		conversationList = (ListView) findViewById(R.id.conversationList);
+		conversationList.setTranscriptMode(ListView.TRANSCRIPT_MODE_NORMAL);
+		conversationList.setStackFromBottom(true);
 		awesome = new AwesomeAdapter(this, messages);
 		conversationList.setAdapter(awesome);
 		animationLeft = AnimationUtils.loadAnimation(this,
-	            R.anim.slide_out_left);
+				R.anim.slide_out_left);
 		animation = AnimationUtils.loadAnimation(this,
-	            android.R.anim.slide_out_right);
+				android.R.anim.slide_out_right);
 		animationLeft.setAnimationListener(new AnimationListener() {
-	        @Override
-	        public void onAnimationStart(Animation animation) {
-	        }
+			@Override
+			public void onAnimationStart(Animation animation) {
+			}
 
-	        @Override
-	        public void onAnimationRepeat(Animation animation) {
-	        }
+			@Override
+			public void onAnimationRepeat(Animation animation) {
+			}
 
-	        @Override
-	        public void onAnimationEnd(Animation animation) {
-	            awesome.remove(toDelete);
-	            awesome.notifyDataSetChanged();
-	            listOfConverstations.get(toDelete).delete();
-	        }
-	    });
-		
+			@Override
+			public void onAnimationEnd(Animation animation) {
+				awesome.remove(toDelete);
+				awesome.notifyDataSetChanged();
+				listOfConverstations.get(toDelete).delete();
+			}
+		});
+
 		animation.setAnimationListener(new AnimationListener() {
-	        @Override
-	        public void onAnimationStart(Animation animation) {
-	        }
+			@Override
+			public void onAnimationStart(Animation animation) {
+			}
 
-	        @Override
-	        public void onAnimationRepeat(Animation animation) {
-	        }
+			@Override
+			public void onAnimationRepeat(Animation animation) {
+			}
 
-	        @Override
-	        public void onAnimationEnd(Animation animation) {
-	            awesome.remove(toDelete);
-	            awesome.notifyDataSetChanged();
-	            listOfConverstations.get(toDelete).delete();
-	        }
-	    });
+			@Override
+			public void onAnimationEnd(Animation animation) {
+				awesome.remove(toDelete);
+				awesome.notifyDataSetChanged();
+				listOfConverstations.get(toDelete).delete();
+			}
+		});
 
-//	    conversationList.setOnItemClickListener(new OnItemClickListener() {
-//	        @Override
-//	        public void onItemClick(AdapterView<?> parent, View view,
-//	                int position, long id) {
-//	            Toast.makeText(getApplicationContext(),
-//	                    " " + messages.get(position).message, Toast.LENGTH_LONG).show();
-//	            view.startAnimation(animation);
-//	            selectedRow = position;
-//
-//	        }
-//
-//	    });
+		//	    conversationList.setOnItemClickListener(new OnItemClickListener() {
+		//	        @Override
+		//	        public void onItemClick(AdapterView<?> parent, View view,
+		//	                int position, long id) {
+		//	            Toast.makeText(getApplicationContext(),
+		//	                    " " + messages.get(position).message, Toast.LENGTH_LONG).show();
+		//	            view.startAnimation(animation);
+		//	            selectedRow = position;
+		//
+		//	        }
+		//
+		//	    });
 		conversationList.setOnItemLongClickListener(new OnItemLongClickListener() {
 			@Override
 			public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
 					int arg2, long arg3) {
 				AlertDialog.Builder builder = new AlertDialog.Builder(MessageActivity.this);
 				toDelete = arg2;
-                builder.setTitle("Action:");
-                deleteView = arg1;
-                builder.setItems(new String[] {"Delete"}, new DialogInterface.OnClickListener() {
+				builder.setTitle("Action:");
+				deleteView = arg1;
+				builder.setItems(new String[] {"Delete"}, new DialogInterface.OnClickListener() {
 
-                    public void onClick(DialogInterface dialog, int item) {
-                    	if (messages.get(toDelete).isMine()) {
-                    		deleteView.startAnimation(animationLeft);
-                    	} else {
-                    		deleteView.startAnimation(animation);
-                    	}
+					public void onClick(DialogInterface dialog, int item) {
+						if (messages.get(toDelete).isMine()) {
+							deleteView.startAnimation(animationLeft);
+						} else {
+							deleteView.startAnimation(animation);
+						}
 
-//                        new AlertDialog.Builder(MessageActivity.this)
-//                        .setTitle(getString(R.string.delete))
-//                        .setMessage(getString(R.string.remove))
-//                        .setPositiveButton("Done", new DialogInterface.OnClickListener() {
-//                            public void onClick(DialogInterface dialog, int which) { 
-////                                Intent intent = new Intent(CartDetailsActivity.this, HomeScreen.class);
-////                                startActivity(intent);
-//                            }
-//                         })
-//                         .show();
-        				AwesomeAdapter.animate = false;
-                    }
+						//                        new AlertDialog.Builder(MessageActivity.this)
+						//                        .setTitle(getString(R.string.delete))
+						//                        .setMessage(getString(R.string.remove))
+						//                        .setPositiveButton("Done", new DialogInterface.OnClickListener() {
+						//                            public void onClick(DialogInterface dialog, int which) { 
+						////                                Intent intent = new Intent(CartDetailsActivity.this, HomeScreen.class);
+						////                                startActivity(intent);
+						//                            }
+						//                         })
+						//                         .show();
+						AwesomeAdapter.animate = false;
+					}
 
-                });
+				});
 
-                AlertDialog alert = builder.create();
-                alert.show();
+				AlertDialog alert = builder.create();
+				alert.show();
 				return false;
 			}
 		});
@@ -167,7 +167,7 @@ public class MessageActivity extends Activity {
 		button.setEnabled(false);
 		EditText et = (EditText) findViewById(R.id.typingArea);
 		et.addTextChangedListener(new TextWatcher() {
-			
+
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
 				if (s.length() > 0) {
@@ -175,60 +175,78 @@ public class MessageActivity extends Activity {
 					button.setEnabled(true);
 				}
 			}
-			
+
 			@Override
 			public void beforeTextChanged(CharSequence s, int start, int count,
 					int after) {
 				Button button = (Button) findViewById(R.id.sendMessage);
 				button.setEnabled(false);
 			}
-			
+
 			@Override
 			public void afterTextChanged(Editable arg0) {
 			}
 		});
+
+		// Show the Up button in the action bar.
+		setupActionBar();
 	}
-	
+
 	public void populateConversationList() {
 		messages.clear();
 		listOfConverstations = Conversation.findWithQuery(Conversation.class, "SELECT * FROM CONVERSATION WHERE (recipient_id = \"" + recipientID + "\" AND sender_id = \"" + senderID + "\")" +
 				" OR (recipient_id = \"" + senderID + "\" AND sender_id = \"" + recipientID + "\");");
-		
+
 		Log.v(TAG, listOfConverstations.size() + "");
 		for (Conversation c : listOfConverstations) {
 			messages.add(new Message(c.message, c.sent));
 		}
 		AwesomeAdapter ad = (AwesomeAdapter) conversationList.getAdapter();
-    	ad.notifyDataSetChanged();
-    	conversationList.setSelection(messages.size() - 1);
+		ad.notifyDataSetChanged();
 	}
-	
+
 	@Override
-    protected void onResume() {
-    	registerReceiver();
-    	populateConversationList();
-    	GcmIntentService.messages.clear();
-    	GcmIntentService.notificationCounter = 0;
-    	NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
-    	notificationManager.cancel(GcmIntentService.NOTIFICATION_ID);
-        super.onResume();
-    }
-	
+	protected void onResume() {
+		registerReceiver();
+		populateConversationList();
+		GcmIntentService.messages.clear();
+		GcmIntentService.notificationCounter = 0;
+		NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+		notificationManager.cancel(GcmIntentService.NOTIFICATION_ID);
+		super.onResume();
+	}
+
 	@Override
-    protected void onPause() {
-  		Log.i(TAG,"onPause()");
-  		/* we should unregister BroadcastReceiver here*/
-  		unregisterReceiver(capitalizeResultReceiver);
-  		super.onPause();
-  	}
-	
+	protected void onPause() {
+		Log.i(TAG,"onPause()");
+		/* we should unregister BroadcastReceiver here*/
+		unregisterReceiver(capitalizeResultReceiver);
+		super.onPause();
+	}
+
 	public void sendMessage(View v) {
+		Button button = (Button) findViewById(R.id.sendMessage);
+		button.setEnabled(false);
 		EditText et = (EditText) findViewById(R.id.typingArea);
 		String message = et.getText().toString();
 		AwesomeAdapter.animate = true;
+		messages.add(new Message(message, true));
+		AwesomeAdapter adapter = (AwesomeAdapter) conversationList.getAdapter();
+		adapter.notifyDataSetChanged();
+		et.setText("");
 		new SendNotification("sendNotification", recipientID, message).execute();
 	}
-	
+
+	/**
+	 * @return Application's {@code SharedPreferences}.
+	 */
+	private SharedPreferences getGcmPreferences(Context context) {
+		// This sample app persists the registration ID in shared preferences, but
+		// how you store the regID in your app is up to you.
+		return context.getSharedPreferences(MainActivity.class.getSimpleName(),
+				Context.MODE_PRIVATE);
+	}
+
 	private void registerReceiver() {
 		/*create filter for exact intent what we want from other intent*/
 		IntentFilter intentFilter =new IntentFilter(TextCapitalizeResultReceiver.ACTION_TEXT_CAPITALIZED);
@@ -238,23 +256,23 @@ public class MessageActivity extends Activity {
 		/* registering our Broadcast receiver to listen action*/
 		registerReceiver(capitalizeResultReceiver, intentFilter);
 	}
-	
+
 	public class TextCapitalizeResultReceiver extends BroadcastReceiver {
-      	/**
-    		 * action string for our broadcast receiver to get notified
-    		 */
-    		public final static String ACTION_TEXT_CAPITALIZED= "com.android.guide.exampleintentservice.intent.action.ACTION_TEXT_CAPITALIZED";
-    		@Override
-    		public void onReceive(Context context, Intent intent) {
-//    			String resultText =intent.getStringExtra(GcmIntentService.OUTPUT_TEXT);
-    			AwesomeAdapter.animate = true;
-    			populateConversationList();
-    			GcmIntentService.messages.clear();
-    	    	GcmIntentService.notificationCounter = 0;
-    	    	NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
-    	    	notificationManager.cancel(GcmIntentService.NOTIFICATION_ID);
-    		}
-    };
+		/**
+		 * action string for our broadcast receiver to get notified
+		 */
+		public final static String ACTION_TEXT_CAPITALIZED= "com.android.guide.exampleintentservice.intent.action.ACTION_TEXT_CAPITALIZED";
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			//    			String resultText =intent.getStringExtra(GcmIntentService.OUTPUT_TEXT);
+			AwesomeAdapter.animate = true;
+			populateConversationList();
+			GcmIntentService.messages.clear();
+			GcmIntentService.notificationCounter = 0;
+			NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+			notificationManager.cancel(GcmIntentService.NOTIFICATION_ID);
+		}
+	};
 
 	/**
 	 * Set up the {@link android.app.ActionBar}, if the API is available.
@@ -263,6 +281,7 @@ public class MessageActivity extends Activity {
 	private void setupActionBar() {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
 			getActionBar().setDisplayHomeAsUpEnabled(true);
+			getActionBar().setTitle(userName);
 		}
 	}
 
@@ -289,115 +308,108 @@ public class MessageActivity extends Activity {
 		}
 		return super.onOptionsItemSelected(item);
 	}
-	
+
 	class SendNotification extends Task {
 
-    	private String recipientID;
-    	private String message;
-    	
-    	public SendNotification(String function, String recipientID, String message) {
-    		super(function);
-    		this.recipientID = recipientID;
-    		this.message = message;
-    	}
-    	
-    	@Override
-    	protected String doInBackground(String... arg0) {
-    		HttpClient httpClient = new DefaultHttpClient();
-    		HttpPost httpPost = new HttpPost(super.getApi());
-    		HttpResponse response;
-    		String result = "";
-    		
-    		List<NameValuePair> params = new ArrayList<NameValuePair>(1);
-    		params.add(new BasicNameValuePair("func", super.getFunction()));
-    		params.add(new BasicNameValuePair("recipient", recipientID));
-    		params.add(new BasicNameValuePair("message", message));
-    		params.add(new BasicNameValuePair("sender", senderID));
-    		try {
-    			httpPost.setEntity(new UrlEncodedFormEntity(params));
-    			response = httpClient.execute(httpPost);
+		private String recipientID;
+		private String message;
 
-    			HttpEntity entity = response.getEntity();
+		public SendNotification(String function, String recipientID, String message) {
+			super(function);
+			this.recipientID = recipientID;
+			this.message = message;
+		}
 
-    			if (entity != null) {
-    				InputStream instream = entity.getContent();
-    				result = convert(instream);
-    				instream.close();
-    				Log.v("RESULT", result);
-    				Conversation convo = new Conversation(MessageActivity.this, senderID, recipientID, message, true);
-        			convo.save();
-        			runOnUiThread(new Runnable() {
-						public void run() {
-							messages.add(new Message(message, true));
-		        			AwesomeAdapter adapter = (AwesomeAdapter) conversationList.getAdapter();
-		        			adapter.notifyDataSetChanged();
-		        			conversationList.setSelection(messages.size() - 1);
-		        			EditText et = (EditText) findViewById(R.id.typingArea);
-		        			et.setText("");
-						}
-					});
-//    				jsonarray = new JSONArray(result);
-//
-//    				// looping through All Names
-//    				for (int i = 0; i < jsonarray.length(); i++) {
-//    					JSONObject obj = jsonarray.getJSONObject(i);
-//
-//    					// Storing each json item in variable
-//    					int id = obj.getInt("id");
-//    					String date = obj.getString("date");
-//    					String startTime = obj.getString("start_time");
-//    					String endTime = obj.getString("end_time");
-//    					String title = obj.getString("title");
-////    					Log.v("TITLE", title);
-//    					int eventTypeId;
-//    					if  (obj.isNull("event_type_id")) {
-//    						eventTypeId = 0;
-//    					}
-//    					else {
-//    						eventTypeId = obj.getInt("event_type_id");
-//    					}
-//    				}
-    			}
-    		} catch (ClientProtocolException e) {
-    			e.printStackTrace();
-    		} catch (IOException e) {
-    			e.printStackTrace();
-    		}
+		@Override
+		protected String doInBackground(String... arg0) {
+			HttpClient httpClient = new DefaultHttpClient();
+			HttpPost httpPost = new HttpPost(super.getApi());
+			HttpResponse response;
+			String result = "";
 
-    		return result;
-    	}
-    	
-    	@Override
-    	protected void onPostExecute (String file_url) {
-//    		progressBar.dismiss();
-    	}
-    	
-    	public String convert(InputStream is) {
-    		/*
-    		 * To convert the InputStream to String we use the BufferedReader.readLine()
-    		 * method. We iterate until the BufferedReader return null which means
-    		 * there's no more data to read. Each line will appended to a StringBuilder
-    		 * and returned as String.
-    		 */
-    		BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-    		StringBuilder sb = new StringBuilder();
+			List<NameValuePair> params = new ArrayList<NameValuePair>(1);
+			params.add(new BasicNameValuePair("func", super.getFunction()));
+			params.add(new BasicNameValuePair("recipient", recipientID));
+			params.add(new BasicNameValuePair("message", message));
+			SharedPreferences pref = getGcmPreferences(MessageActivity.this);
+			String registrationId = pref.getString(MainActivity.PROPERTY_REG_ID, "empty");
+			Log.v("REGID", registrationId);
+			params.add(new BasicNameValuePair("sender", registrationId));
+			try {
+				httpPost.setEntity(new UrlEncodedFormEntity(params));
+				response = httpClient.execute(httpPost);
 
-    		String line = null;
-    		try {
-    			while ((line = reader.readLine()) != null) {
-    				sb.append(line + "\n");
-    			}
-    		} catch (IOException e) {
-    			e.printStackTrace();
-    		} finally {
-    			try {
-    				is.close();
-    			} catch (IOException e) {
-    				e.printStackTrace();
-    			}
-    		}
-    		return sb.toString();
-    	}
-    }
+				HttpEntity entity = response.getEntity();
+
+				if (entity != null) {
+					InputStream instream = entity.getContent();
+					result = convert(instream);
+					instream.close();
+					Log.v("RESULT", result);
+					Conversation convo = new Conversation(MessageActivity.this, senderID, recipientID, message, true);
+					convo.save();
+					//    				jsonarray = new JSONArray(result);
+					//
+					//    				// looping through All Names
+					//    				for (int i = 0; i < jsonarray.length(); i++) {
+					//    					JSONObject obj = jsonarray.getJSONObject(i);
+					//
+					//    					// Storing each json item in variable
+					//    					int id = obj.getInt("id");
+					//    					String date = obj.getString("date");
+					//    					String startTime = obj.getString("start_time");
+					//    					String endTime = obj.getString("end_time");
+					//    					String title = obj.getString("title");
+					////    					Log.v("TITLE", title);
+					//    					int eventTypeId;
+					//    					if  (obj.isNull("event_type_id")) {
+					//    						eventTypeId = 0;
+					//    					}
+					//    					else {
+					//    						eventTypeId = obj.getInt("event_type_id");
+					//    					}
+					//    				}
+				}
+			} catch (ClientProtocolException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+			return result;
+		}
+
+		@Override
+		protected void onPostExecute (String file_url) {
+			//    		progressBar.dismiss();
+		}
+
+		public String convert(InputStream is) {
+			/*
+			 * To convert the InputStream to String we use the BufferedReader.readLine()
+			 * method. We iterate until the BufferedReader return null which means
+			 * there's no more data to read. Each line will appended to a StringBuilder
+			 * and returned as String.
+			 */
+			BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+			StringBuilder sb = new StringBuilder();
+
+			String line = null;
+			try {
+				while ((line = reader.readLine()) != null) {
+					sb.append(line + "\n");
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			} finally {
+				try {
+					is.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			return sb.toString();
+		}
+	}
 
 }

@@ -19,7 +19,6 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import android.app.Activity;
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -82,6 +81,7 @@ public class MainActivity extends Activity {
 	GoogleCloudMessaging gcm;
 	AtomicInteger msgId = new AtomicInteger();
 	Context context;
+	String string;
 
 	static String regid;
 
@@ -91,19 +91,25 @@ public class MainActivity extends Activity {
 		Log.v(TAG, "In on new intent");
 		Bundle extras = intent.getExtras();
 		if(extras != null){
-			String string = extras.getString(EXTRA_NOTIFICATION_RETRIEVE);
+			string = extras.getString(EXTRA_NOTIFICATION_RETRIEVE);
 			if (string!= null) {
-				Intent tent = new Intent(MainActivity.this, MessageActivity.class);
-				tent.putExtra(MainActivity.EXTRA_DEVICE_ID, string);
-				tent.putExtra(MainActivity.EXTRA_SENDER_ID, regid);
-				for (Entry<String, String> entry : map.entrySet()) {
-					if (string.equals(entry.getValue())) {
-						String username = entry.getKey();
-						Log.v(TAG, username);
-						tent.putExtra(MainActivity.EXTRA_USER_NAME, username);
-					}
-				}
-				startActivity(tent); 
+//				users.clear();
+//				new GetUsers(new OnTaskCompleted() {
+//					@Override
+//					public void onTaskCompleted() {
+						Intent tent = new Intent(MainActivity.this, MessageActivity.class);
+						tent.putExtra(MainActivity.EXTRA_DEVICE_ID, string);
+						tent.putExtra(MainActivity.EXTRA_SENDER_ID, regid);
+						for (Entry<String, String> entry : map.entrySet()) {
+							if (string.equals(entry.getValue())) {
+								String username = entry.getKey();
+								Log.v(TAG, username);
+								tent.putExtra(MainActivity.EXTRA_USER_NAME, username);
+							}
+						}
+						startActivity(tent); 
+//					}
+//				}).execute();
 			}
 		}
 	}

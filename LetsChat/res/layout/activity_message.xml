@@ -8,10 +8,10 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".MessageActivity" >
 
-    <TextView
+    <!--<TextView
         android:id="@+id/conversationWith"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content" /> -->
 
     <LinearLayout
         android:id="@+id/sendArea"
@@ -41,7 +41,6 @@
         android:id="@+id/conversationList"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@id/sendArea"
-        android:layout_below="@id/conversationWith" />
+        android:layout_above="@id/sendArea"/>
 
 </RelativeLayout>
