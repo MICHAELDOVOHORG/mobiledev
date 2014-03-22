@@ -4,6 +4,12 @@ import java.util.ArrayList;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ImageSpan;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -70,6 +76,28 @@ public class AwesomeAdapter extends BaseAdapter {
 		//			//Check whether message is mine to show green background and align to right
 		if(message.isMine())
 		{
+			SpannableString ss = new SpannableString("abc"); 
+            Drawable d = mContext.getResources().getDrawable(R.drawable.test); 
+            Bitmap bitmap = ((BitmapDrawable) d).getBitmap();
+            Drawable dr = new BitmapDrawable(mContext.getResources(), Bitmap.createScaledBitmap(bitmap, 200, 200, true));
+            dr.setBounds(0, 0, dr.getIntrinsicWidth(), dr.getIntrinsicHeight()); 
+            ImageSpan span = new ImageSpan(dr, ImageSpan.ALIGN_BASELINE); 
+            ss.setSpan(span, 0, 3, Spannable.SPAN_INCLUSIVE_EXCLUSIVE); 
+            holder.message.append("\n");
+            holder.message.append("\n");
+            holder.message.append(ss);
+//			ImageSpan imageSpan = new ImageSpan(mContext.getResources().getDrawable(R.drawable.test)); //Find your drawable.
+//	        SpannableString spannableString = new SpannableString(holder.message.getText()); //Set text of SpannableString from TextView
+//	        spannableString.setSpan(imageSpan, 0, 0, 0);
+//	        holder.message.setText(spannableString);
+//	        Drawable dr = mContext.getResources().getDrawable(R.drawable.test);
+//			Bitmap bitmap = ((BitmapDrawable) dr).getBitmap();
+			// Scale it to 50 x 50
+//			Drawable d = new BitmapDrawable(mContext.getResources(), Bitmap.createScaledBitmap(bitmap, 50, 50, true));
+//			d.setBounds(100, 100, 200, 200);
+//			holder.message.setCompoundDrawables(d, null, null, null);
+//			holder.message.setCompoundDrawablePadding(100);
+//			holder.message.setCompoundDrawablesWithIntrinsicBounds(d, 0, 0, 0);
 			holder.message.setBackgroundResource(R.drawable.speech_bubble_green);
 			lp.gravity = Gravity.RIGHT;
 		}
