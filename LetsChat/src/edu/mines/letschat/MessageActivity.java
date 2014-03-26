@@ -75,6 +75,7 @@ public class MessageActivity extends Activity {
 	Animation animationLeft;
 	boolean hasPicture = false;
 	String filePath;
+	String uploadName;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -246,10 +247,11 @@ public class MessageActivity extends Activity {
 		messages.clear();
 		listOfConverstations = Conversation.findWithQuery(Conversation.class, "SELECT * FROM CONVERSATION WHERE (recipient_id = \"" + recipientID + "\" AND sender_id = \"" + senderID + "\")" +
 				" OR (recipient_id = \"" + senderID + "\" AND sender_id = \"" + recipientID + "\");");
+//		listOfConverstations = Conversation.findWithQuery(Conversation.class, "SELECT * FROM CONVERSATION WHERE picture = \"21131957.png\";");
 
 		Log.v(TAG, listOfConverstations.size() + "");
 		for (Conversation c : listOfConverstations) {
-			messages.add(new Message(c.message, c.sent));
+			messages.add(new Message(c.message, c.sent, c.picture));
 		}
 		AwesomeAdapter ad = (AwesomeAdapter) conversationList.getAdapter();
 		ad.notifyDataSetChanged();
@@ -281,7 +283,15 @@ public class MessageActivity extends Activity {
 		EditText et = (EditText) findViewById(R.id.typingArea);
 		String message = et.getText().toString();
 //		AwesomeAdapter.animate = true;
-		messages.add(new Message(message, true));
+		if (hasPicture) {
+			Calendar c = Calendar.getInstance(); 
+			int hour = c.get(Calendar.HOUR);
+			int minute = c.get(Calendar.MINUTE);
+			int second = c.get(Calendar.SECOND);
+			int milli = c.get(Calendar.MILLISECOND);
+			uploadName = "" + hour + minute + second + milli + ".png";
+		}
+		messages.add(new Message(message, true, uploadName));
 		AwesomeAdapter adapter = (AwesomeAdapter) conversationList.getAdapter();
 		adapter.notifyDataSetChanged();
 		et.setText("");
@@ -441,6 +451,11 @@ public class MessageActivity extends Activity {
 			params.add(new BasicNameValuePair("func", super.getFunction()));
 			params.add(new BasicNameValuePair("recipient", recipientID));
 			params.add(new BasicNameValuePair("message", message));
+			if (hasPicture) {
+				params.add(new BasicNameValuePair("picture", uploadName));
+			} else {
+				params.add(new BasicNameValuePair("picture", ""));
+			}
 			SharedPreferences pref = getGcmPreferences(MessageActivity.this);
 			String registrationId = pref.getString(MainActivity.PROPERTY_REG_ID, "empty");
 			Log.v("REGID", registrationId);
@@ -456,7 +471,10 @@ public class MessageActivity extends Activity {
 					result = convert(instream);
 					instream.close();
 					Log.v("RESULT", result);
-					Conversation convo = new Conversation(MessageActivity.this, senderID, recipientID, message, true);
+					if (!hasPicture) {
+						uploadName = "";
+					}
+					Conversation convo = new Conversation(MessageActivity.this, senderID, recipientID, message, true, uploadName);
 					convo.save();
 					//    				jsonarray = new JSONArray(result);
 					//
@@ -505,12 +523,7 @@ public class MessageActivity extends Activity {
 			HttpPost httpPost = new HttpPost(postReceiverUrl);
 
 			File file = new File(filePath);
-			Calendar c = Calendar.getInstance(); 
-			int hour = c.get(Calendar.HOUR);
-			int minute = c.get(Calendar.MINUTE);
-			int second = c.get(Calendar.SECOND);
-			int milli = c.get(Calendar.MILLISECOND);
-			String uploadName = "" + hour + minute + second + milli + ".png";
+			
 			FileBody fileBody = new FileBody(file, ContentType.MULTIPART_FORM_DATA, uploadName);
 
 			CustomMultiPartEntity multipartContent = new CustomMultiPartEntity(new ProgressListener()

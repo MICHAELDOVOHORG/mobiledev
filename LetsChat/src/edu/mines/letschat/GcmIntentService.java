@@ -85,6 +85,8 @@ public class GcmIntentService extends IntentService {
                 String message = (String) extras.get("message");
                 messages.add(message);
                 
+                String picture = (String) extras.get("picture");
+                
                 String senderID = (String) extras.get("sender");
                 String recipientID = (String) extras.get("recipient");
                 sendNotification(message, senderID);
@@ -99,8 +101,9 @@ public class GcmIntentService extends IntentService {
          
         		/*add data to intent*/
         		resultBroadCastIntent.putExtra(OUTPUT_TEXT, message);
-        		Log.v(TAG, "Sender id " + senderID + " recieve id " + recipientID);
-        		Conversation convo = new Conversation(getApplicationContext(), senderID, recipientID, message, false);
+//        		Log.v(TAG, "Sender id " + senderID + " recieve id " + recipientID);
+        		Log.v(TAG, picture);
+        		Conversation convo = new Conversation(getApplicationContext(), senderID, recipientID, message, false, picture);
     			convo.save();
         		/*send broadcast */
         		sendBroadcast(resultBroadCastIntent);
