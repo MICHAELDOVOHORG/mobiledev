@@ -1,6 +1,8 @@
 package edu.mines.letschat;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -13,13 +15,17 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
+import edu.mines.letschat.CustomMultiPartEntity.ProgressListener;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.NotificationManager;
+import android.app.ProgressDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -43,7 +49,12 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.provider.MediaStore;
 
 public class MessageActivity extends Activity {
 	private String recipientID;
@@ -60,6 +71,8 @@ public class MessageActivity extends Activity {
 	int selectedRow;
 	Animation animation;
 	Animation animationLeft;
+	boolean hasPicture = false;
+	String filePath;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -270,8 +283,47 @@ public class MessageActivity extends Activity {
 		AwesomeAdapter adapter = (AwesomeAdapter) conversationList.getAdapter();
 		adapter.notifyDataSetChanged();
 		et.setText("");
+		et.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
 		new SendNotification("sendNotification", recipientID, message).execute();
 //		AwesomeAdapter.animate = false;
+	}
+	
+	public void addPicture(View v) {
+		Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+		photoPickerIntent.setType("image/*");
+		startActivityForResult(photoPickerIntent, 100);
+	}
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) { 
+		super.onActivityResult(requestCode, resultCode, imageReturnedIntent); 
+
+		switch(requestCode) { 
+		case 100:
+			if(resultCode == RESULT_OK){
+				Uri selectedImage = imageReturnedIntent.getData();
+
+				String[] filePathColumn = {MediaStore.Images.Media.DATA};
+				Cursor cursor = getContentResolver().query(selectedImage, filePathColumn, null, null, null);
+				cursor.moveToFirst();
+				int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+				filePath = cursor.getString(columnIndex);
+				Log.v("log","filePath is : " + filePath); 
+				EditText text = (EditText)findViewById(R.id.typingArea);
+				InputStream inputStream;
+				try {
+					inputStream = getContentResolver().openInputStream(selectedImage);
+					Drawable d = Drawable.createFromStream(inputStream, selectedImage.toString());
+		            Bitmap bitmap = ((BitmapDrawable) d).getBitmap();
+		            Drawable dr = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(bitmap, 200, 200, true));
+		            dr.setBounds(0, 0, dr.getIntrinsicWidth(), dr.getIntrinsicHeight());
+					text.setCompoundDrawablesWithIntrinsicBounds(null, null, dr, null);
+					hasPicture = true;
+				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 	}
 
 	/**
@@ -350,15 +402,32 @@ public class MessageActivity extends Activity {
 
 		private String recipientID;
 		private String message;
+		ProgressDialog pd;
+		long totalSize;
 
 		public SendNotification(String function, String recipientID, String message) {
 			super(function);
 			this.recipientID = recipientID;
 			this.message = message;
 		}
+		
+		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
+			if (hasPicture) {
+				pd = new ProgressDialog(MessageActivity.this);
+				pd.setCancelable(false);
+				pd.setMessage("Sending file...");
+				pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+				pd.show();
+			}
+		}
 
 		@Override
 		protected String doInBackground(String... arg0) {
+			if (hasPicture) {
+				handlePicture();
+			}
 			HttpClient httpClient = new DefaultHttpClient();
 			HttpPost httpPost = new HttpPost(super.getApi());
 			HttpResponse response;
@@ -415,10 +484,70 @@ public class MessageActivity extends Activity {
 
 			return result;
 		}
+		
+		@SuppressWarnings("deprecation")
+		public void handlePicture() {
+//			String textFile = Environment.getExternalStorageDirectory() + "/sample.txt";
+			Log.v("log", "textFile: " + filePath);
+
+			// the URL where the file will be posted
+			String postReceiverUrl = "http://justacomputerscientist.com/mobile/handle_upload.php";
+			Log.v("log", "postURL: " + postReceiverUrl);
+
+			// new HttpClient
+			HttpClient httpClient = new DefaultHttpClient();
+
+			// post header
+			HttpPost httpPost = new HttpPost(postReceiverUrl);
+
+			File file = new File(filePath);
+			FileBody fileBody = new FileBody(file);
+
+//			MultipartEntity reqEntity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE);
+//			MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+//			builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
+			CustomMultiPartEntity multipartContent = new CustomMultiPartEntity(new ProgressListener()
+			{
+				@Override
+				public void transferred(final long num)
+				{
+					pd.setMax((int) totalSize);
+//					publishProgress((int) num);
+					pd.setProgress((int) num);
+				}
+			});
+			multipartContent.addPart("uploadedfile", fileBody);
+			totalSize = multipartContent.getContentLength();
+			httpPost.setEntity(multipartContent);
+			
+
+			// execute HTTP post request
+			HttpResponse response;
+			try {
+				response = httpClient.execute(httpPost);
+				HttpEntity resEntity = response.getEntity();
+
+				if (resEntity != null) {
+
+					String responseStr = EntityUtils.toString(resEntity).trim();
+					Log.v("log", "Response: " +  responseStr);
+				}
+			} catch (ClientProtocolException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 
 		@Override
 		protected void onPostExecute (String file_url) {
 			//    		progressBar.dismiss();
+			if (hasPicture) {
+				pd.dismiss();
+			}
+			hasPicture = false;
 		}
 
 		public String convert(InputStream is) {
