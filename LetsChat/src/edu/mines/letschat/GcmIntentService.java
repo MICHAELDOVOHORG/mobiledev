@@ -174,5 +174,6 @@ public class GcmIntentService extends IntentService {
         mBuilder.setAutoCancel(true);
         mBuilder.setContentIntent(contentIntent);
         mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+//        AwesomeAdapter.animate = true;
     }
 }

@@ -6,7 +6,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -28,7 +27,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -38,12 +36,14 @@ public class LoginActivity extends Activity {
 	public static final String EXTRA_LOGIN = "edu.mines.letschat.EXTRA_LOGIN";
 	public static final String EXTRA_PASSWORD = "edu.mines.letschat.EXTRA_PASSWORD";
 	private SharedPreferences sharedPref;
-	
+	String loginResult, signupResult;
+	String username, password, confirmpassword;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_login);
-		
+
 		sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
 		//If the user is logged in, then don't show the login screen. Go straight to the schedule page
@@ -54,9 +54,10 @@ public class LoginActivity extends Activity {
 			intent.putExtra(EXTRA_LOGIN, username);
 			intent.putExtra(EXTRA_PASSWORD, password);
 			startActivity(intent);
+			finish();
 		}
 	}
-	
+
 	@Override
 	protected void onResume() {
 		super.onResume();
@@ -67,15 +68,16 @@ public class LoginActivity extends Activity {
 			intent.putExtra(EXTRA_LOGIN, username);
 			intent.putExtra(EXTRA_PASSWORD, password);
 			startActivity(intent);
+			finish();
 		}
 	}
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.login, menu);
-		return true;
-	}
+//	@Override
+//	public boolean onCreateOptionsMenu(Menu menu) {
+//		// Inflate the menu; this adds items to the action bar if it is present.
+//		getMenuInflater().inflate(R.menu.login, menu);
+//		return true;
+//	}
 
 	public void login(View v) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -92,29 +94,31 @@ public class LoginActivity extends Activity {
 		builder.setPositiveButton(R.string.signin, new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int id) {
-				String username = usernameEdit.getText().toString();
-				String password = passwordEdit.getText().toString();
-				String result;
-				try {
-					result = new CheckLogin(username, password).execute().get();
-					if (result.equals("Success")) {
-						SharedPreferences.Editor editor = sharedPref.edit();
-						editor.putBoolean("loggedIn", true);
-						editor.putString("username", username);
-						editor.putString("password", password);
-						editor.commit();
-						Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-						intent.putExtra(EXTRA_LOGIN, username);
-						intent.putExtra(EXTRA_PASSWORD, password);
-						startActivity(intent);
-					} else {
-						Toast.makeText(LoginActivity.this, "Sorry incorrect username/password", Toast.LENGTH_LONG).show();
+				username = usernameEdit.getText().toString();
+				password = passwordEdit.getText().toString();
+				new CheckLogin(username, password, new OnTaskCompleted() {
+
+					@Override
+					public void onTaskCompleted() {
+						Log.v("login result", loginResult);
+						if (loginResult.equals("Success\n")) {
+							SharedPreferences.Editor editor = sharedPref.edit();
+							editor.putBoolean("loggedIn", true);
+							editor.putString("username", username);
+							editor.putString("password", password);
+							editor.commit();
+							Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+							intent.putExtra(EXTRA_LOGIN, username);
+							intent.putExtra(EXTRA_PASSWORD, password);
+							startActivity(intent);
+							finish();
+						} else {
+							Toast.makeText(LoginActivity.this, "Sorry incorrect username/password", Toast.LENGTH_LONG).show();
+						}
 					}
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				} catch (ExecutionException e) {
-					e.printStackTrace();
-				}
+					
+				}).execute();
+				//					result = cl.get();
 			}
 		})
 		.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -141,9 +145,9 @@ public class LoginActivity extends Activity {
 		builder.setPositiveButton(R.string.signup, new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int id) {
-				String username = usernameEdit.getText().toString();
-				String password = passwordEdit.getText().toString();
-				String confirmpassword = confirmpasswordEdit.getText().toString();
+				username = usernameEdit.getText().toString();
+				password = passwordEdit.getText().toString();
+				confirmpassword = confirmpasswordEdit.getText().toString();
 				if (username.isEmpty()) {
 					Toast.makeText(LoginActivity.this, "Username cannot be empty", Toast.LENGTH_LONG).show();
 				}
@@ -153,27 +157,29 @@ public class LoginActivity extends Activity {
 				else if (!password.equals(confirmpassword)) {
 					Toast.makeText(LoginActivity.this, "Passwords don't match", Toast.LENGTH_LONG).show();
 				} else {
-					String result;
-					try {
-						result = new CheckUser(username).execute().get();
-						if (result.equals("Success")) {
-							SharedPreferences.Editor editor = sharedPref.edit();
-							editor.putBoolean("loggedIn", true);
-							editor.putString("username", username);
-							editor.putString("password", password);
-							editor.commit();
-							Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-							intent.putExtra(EXTRA_LOGIN, username);
-							intent.putExtra(EXTRA_PASSWORD, password);
-							startActivity(intent);
-						} else {
-							Toast.makeText(LoginActivity.this, "Sorry that username already exists", Toast.LENGTH_LONG).show();
-						}
-					} catch (InterruptedException e1) {
-						e1.printStackTrace();
-					} catch (ExecutionException e1) {
-						e1.printStackTrace();
-					}
+//					String result;
+						new CheckUser(username, new OnTaskCompleted(){
+
+							@Override
+							public void onTaskCompleted() {
+								if (signupResult.equals("Success\n")) {
+									SharedPreferences.Editor editor = sharedPref.edit();
+									editor.putBoolean("loggedIn", true);
+									editor.putString("username", username);
+									editor.putString("password", password);
+									editor.commit();
+									Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+									intent.putExtra(EXTRA_LOGIN, username);
+									intent.putExtra(EXTRA_PASSWORD, password);
+									startActivity(intent);
+									finish();
+								} else {
+									Toast.makeText(LoginActivity.this, "Sorry that username already exists", Toast.LENGTH_LONG).show();
+								}
+							}
+							
+						}).execute();
+//						result = cu.get();
 				}
 			}
 		})
@@ -191,18 +197,20 @@ public class LoginActivity extends Activity {
 		private static final String API = "http://justacomputerscientist.com/mobile/api.php";
 		private String username;
 		ProgressDialog dialog;
+		OnTaskCompleted listener;
 		//		private OnTaskCompleted listener;
 		//
 		//		public GetUsers(OnTaskCompleted listener) {
 		//			this.listener = listener;
 		//		}
 
-		public CheckUser(String username) {
+		public CheckUser(String username, OnTaskCompleted listener) {
 			this.username = username;
+			this.listener = listener;
 		}
-		
+
 		@Override
-	    protected void onPreExecute() {
+		protected void onPreExecute() {
 			dialog = new ProgressDialog(LoginActivity.this);
 			dialog.setCancelable(false);
 			dialog.setMessage("Siging up please wait...");
@@ -214,7 +222,7 @@ public class LoginActivity extends Activity {
 			HttpClient httpClient = new DefaultHttpClient();
 			HttpPost httpPost = new HttpPost(API);
 			HttpResponse response;
-			String result = "";
+//			String result = "";
 
 			List<NameValuePair> params = new ArrayList<NameValuePair>(1);
 			params.add(new BasicNameValuePair("func", FUNCTION));
@@ -226,10 +234,10 @@ public class LoginActivity extends Activity {
 
 				if (entity != null) {
 					InputStream instream = entity.getContent();
-					result = convert(instream);
+					signupResult = convert(instream);
 					instream.close();
-					Log.v("RESULT", result);
-					if (result.equals("Success\n")) {
+					Log.v("RESULT", signupResult);
+					if (signupResult.equals("Success\n")) {
 						return "Success";
 					} else {
 						return "Fail";
@@ -240,12 +248,13 @@ public class LoginActivity extends Activity {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			return result;
+			return signupResult;
 		}
-		
+
 		@Override
 		protected void onPostExecute(String msg) {
 			dialog.dismiss();
+			listener.onTaskCompleted();
 		}
 
 		public String convert(InputStream is) {
@@ -275,26 +284,27 @@ public class LoginActivity extends Activity {
 			return sb.toString();
 		}
 	}
-	
+
 	public class CheckLogin extends AsyncTask<String, String, String> {
 
 		private static final String FUNCTION = "checkLogin";
 		private static final String API = "http://justacomputerscientist.com/mobile/api.php";
 		private String username, password;
 		ProgressDialog dialog;
-		//		private OnTaskCompleted listener;
+		private OnTaskCompleted listener;
 		//
 		//		public GetUsers(OnTaskCompleted listener) {
 		//			this.listener = listener;
 		//		}
 
-		public CheckLogin(String username, String password) {
+		public CheckLogin(String username, String password, OnTaskCompleted listener) {
 			this.username = username;
 			this.password = password;
+			this.listener = listener;
 		}
-		
+
 		@Override
-	    protected void onPreExecute() {
+		protected void onPreExecute() {
 			dialog = new ProgressDialog(LoginActivity.this);
 			dialog.setCancelable(false);
 			dialog.setMessage("Siging in please wait...");
@@ -306,7 +316,7 @@ public class LoginActivity extends Activity {
 			HttpClient httpClient = new DefaultHttpClient();
 			HttpPost httpPost = new HttpPost(API);
 			HttpResponse response;
-			String result = "";
+//			String result = "";
 
 			List<NameValuePair> params = new ArrayList<NameValuePair>(1);
 			params.add(new BasicNameValuePair("func", FUNCTION));
@@ -319,10 +329,10 @@ public class LoginActivity extends Activity {
 
 				if (entity != null) {
 					InputStream instream = entity.getContent();
-					result = convert(instream);
+					loginResult = convert(instream);
 					instream.close();
-					Log.v("RESULT", result);
-					if (result.equals("Success\n")) {
+					Log.v("RESULT", loginResult);
+					if (loginResult.equals("Success\n")) {
 						return "Success";
 					} else {
 						return "Fail";
@@ -333,12 +343,13 @@ public class LoginActivity extends Activity {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			return result;
+			return loginResult;
 		}
-		
+
 		@Override
 		protected void onPostExecute(String msg) {
 			dialog.dismiss();
+			listener.onTaskCompleted();
 		}
 
 		public String convert(InputStream is) {

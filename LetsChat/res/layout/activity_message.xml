@@ -19,12 +19,20 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:orientation="horizontal" >
+        
+        <Button
+            android:id="@+id/addPicture"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight=".15"
+            android:onClick="addPicture"
+            android:background="@drawable/ic_action_photo" />
 
         <EditText
             android:id="@+id/typingArea"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight=".75"
+            android:layout_weight=".70"
             android:hint="@string/entertext"
             android:inputType="textMultiLine" />
 
@@ -32,15 +40,15 @@
             android:id="@+id/sendMessage"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight=".25"
+            android:layout_weight=".15"
             android:onClick="sendMessage"
-            android:text="@string/send" />
+            android:background="@drawable/ic_action_send" />
     </LinearLayout>
 
     <ListView
         android:id="@+id/conversationList"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="fill_parent"
         android:layout_above="@id/sendArea"/>
 
 </RelativeLayout>

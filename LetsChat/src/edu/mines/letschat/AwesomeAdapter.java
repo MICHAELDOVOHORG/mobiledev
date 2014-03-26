@@ -1,7 +1,6 @@
 package edu.mines.letschat;
 
 import java.util.ArrayList;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -14,8 +13,6 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.BaseAdapter;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
@@ -76,8 +73,9 @@ public class AwesomeAdapter extends BaseAdapter {
 		//			//Check whether message is mine to show green background and align to right
 		if(message.isMine())
 		{
+//			new GetImage(holder).execute();
 			SpannableString ss = new SpannableString("abc"); 
-            Drawable d = mContext.getResources().getDrawable(R.drawable.test); 
+            Drawable d = mContext.getResources().getDrawable(R.drawable.test);
             Bitmap bitmap = ((BitmapDrawable) d).getBitmap();
             Drawable dr = new BitmapDrawable(mContext.getResources(), Bitmap.createScaledBitmap(bitmap, 200, 200, true));
             dr.setBounds(0, 0, dr.getIntrinsicWidth(), dr.getIntrinsicHeight()); 
@@ -110,19 +108,71 @@ public class AwesomeAdapter extends BaseAdapter {
 		holder.message.setLayoutParams(lp);
 		holder.message.setTextColor(R.color.textColor);	
 		//		}
-		if (animate) {
-			if (position == mMessages.size() - 1 && mMessages.get(mMessages.size() - 1).isMine()) {
-				Animation animation = AnimationUtils.loadAnimation(mContext, android.R.anim.slide_in_left);
-				convertView.startAnimation(animation);
-			}
-			
-			if (position == mMessages.size() - 1 && !mMessages.get(mMessages.size() - 1).isMine()) {
-				Animation animation = AnimationUtils.loadAnimation(mContext, R.anim.slide_in_right);
-				convertView.startAnimation(animation);
-			}
-		}
+//		if (animate) {
+//			if (position == mMessages.size() - 1 && mMessages.get(mMessages.size() - 1).isMine()) {
+//				Animation animation = AnimationUtils.loadAnimation(mContext, android.R.anim.slide_in_left);
+//				convertView.startAnimation(animation);
+//			}
+//			
+//			if (position == mMessages.size() - 1 && !mMessages.get(mMessages.size() - 1).isMine()) {
+//				Animation animation = AnimationUtils.loadAnimation(mContext, R.anim.slide_in_right);
+//				convertView.startAnimation(animation);
+//			}
+//		}
 		return convertView;
 	}
+	
+//	class GetImage extends AsyncTask<String, String, String> {
+//		
+//		ViewHolder holder;
+//		
+//		public GetImage(ViewHolder holder) {
+//			this.holder = holder;
+//		}
+//
+//		@Override
+//		protected String doInBackground(String... arg0) {
+//			try {
+//		        /* Open a new URL and get the InputStream to load data from it. */
+//		        URL aURL = new URL("http://justacomputerscientist.com/mobile/turkey.jpg");
+//		        URLConnection conn = aURL.openConnection();
+//		        conn.connect();
+//		        InputStream is = conn.getInputStream();
+//		        /* Buffered is always good for a performance plus. */
+//		        BufferedInputStream bis = new BufferedInputStream(is);
+//		        /* Decode url-data to a bitmap. */
+//		        Bitmap bm = BitmapFactory.decodeStream(bis);
+//		        bis.close();
+//		        is.close();
+//
+//		        Drawable d =new BitmapDrawable(bm);
+////		        d.setId("1");
+//		        Activity activity = (Activity) mContext;
+//		        activity.runOnUiThread(new Runnable() {
+//		            @Override
+//		            public void run() {
+//		            	SpannableString ss = new SpannableString("abc"); 
+////		              Drawable d = mContext.getResources().getDrawable(R.drawable.test);
+//		              Bitmap bitmap = ((BitmapDrawable) d).getBitmap();
+//		              Drawable dr = new BitmapDrawable(mContext.getResources(), Bitmap.createScaledBitmap(bitmap, 200, 200, true));
+//		              dr.setBounds(0, 0, dr.getIntrinsicWidth(), dr.getIntrinsicHeight()); 
+//		              ImageSpan span = new ImageSpan(dr, ImageSpan.ALIGN_BASELINE); 
+//		              ss.setSpan(span, 0, 3, Spannable.SPAN_INCLUSIVE_EXCLUSIVE); 
+////		              holder.message.append("\n");
+////		              holder.message.append("\n");
+////		              holder.message.append(ss);
+//		              holder.message.setText("\n\n" + ss);
+////		              holder.message.setCompoundDrawablesWithIntrinsicBounds(d,null,null,null);// wherever u want the image relative to textview
+//		           }
+//		       });
+//		        
+//		        } catch (IOException e) {
+//		        	Log.e("DEBUGTAG", "Remote Image Exception", e);
+//		        } 
+//			return null;
+//		}
+//		
+//	}
 	
 	private static class ViewHolder
 	{

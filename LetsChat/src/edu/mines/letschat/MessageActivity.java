@@ -15,7 +15,6 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
-
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Activity;
@@ -24,7 +23,6 @@ import android.app.NotificationManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
@@ -67,6 +65,7 @@ public class MessageActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_message);
+//		AwesomeAdapter.animate = false;
 
 		recipientID = getIntent().getStringExtra(MainActivity.EXTRA_DEVICE_ID);
 		senderID = getIntent().getStringExtra(MainActivity.EXTRA_SENDER_ID);
@@ -167,7 +166,7 @@ public class MessageActivity extends Activity {
 						//                            }
 						//                         })
 						//                         .show();
-						AwesomeAdapter.animate = false;
+//						AwesomeAdapter.animate = false;
 					}
 
 				});
@@ -202,6 +201,27 @@ public class MessageActivity extends Activity {
 			public void afterTextChanged(Editable arg0) {
 			}
 		});
+		
+//		et.setOnEditorActionListener(new OnEditorActionListener() {
+//		    @Override
+//		    public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+//		        boolean handled = false;
+//		        if (actionId == EditorInfo.IME_ACTION_SEND) {
+//		        	Button button = (Button) findViewById(R.id.sendMessage);
+//		    		button.setEnabled(false);
+//		    		EditText et = (EditText) findViewById(R.id.typingArea);
+//		    		String message = et.getText().toString();
+////		    		AwesomeAdapter.animate = true;
+//		    		messages.add(new Message(message, true));
+//		    		AwesomeAdapter adapter = (AwesomeAdapter) conversationList.getAdapter();
+//		    		adapter.notifyDataSetChanged();
+//		    		et.setText("");
+//		    		new SendNotification("sendNotification", recipientID, message).execute();
+//		            handled = true;
+//		        }
+//		        return handled;
+//		    }
+//		});
 
 		// Show the Up button in the action bar.
 		setupActionBar();
@@ -228,6 +248,7 @@ public class MessageActivity extends Activity {
 		GcmIntentService.notificationCounter = 0;
 		NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
 		notificationManager.cancel(GcmIntentService.NOTIFICATION_ID);
+//		AwesomeAdapter.animate = false;
 		super.onResume();
 	}
 
@@ -244,12 +265,13 @@ public class MessageActivity extends Activity {
 		button.setEnabled(false);
 		EditText et = (EditText) findViewById(R.id.typingArea);
 		String message = et.getText().toString();
-		AwesomeAdapter.animate = true;
+//		AwesomeAdapter.animate = true;
 		messages.add(new Message(message, true));
 		AwesomeAdapter adapter = (AwesomeAdapter) conversationList.getAdapter();
 		adapter.notifyDataSetChanged();
 		et.setText("");
 		new SendNotification("sendNotification", recipientID, message).execute();
+//		AwesomeAdapter.animate = false;
 	}
 
 	/**
@@ -280,7 +302,7 @@ public class MessageActivity extends Activity {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			//    			String resultText =intent.getStringExtra(GcmIntentService.OUTPUT_TEXT);
-			AwesomeAdapter.animate = true;
+//			AwesomeAdapter.animate = true;
 			populateConversationList();
 			GcmIntentService.messages.clear();
 			GcmIntentService.notificationCounter = 0;
@@ -300,12 +322,12 @@ public class MessageActivity extends Activity {
 		}
 	}
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.message, menu);
-		return true;
-	}
+//	@Override
+//	public boolean onCreateOptionsMenu(Menu menu) {
+//		// Inflate the menu; this adds items to the action bar if it is present.
+//		getMenuInflater().inflate(R.menu.message, menu);
+//		return true;
+//	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
