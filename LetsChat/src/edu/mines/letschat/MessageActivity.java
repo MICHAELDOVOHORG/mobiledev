@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -15,6 +16,7 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
@@ -503,11 +505,14 @@ public class MessageActivity extends Activity {
 			HttpPost httpPost = new HttpPost(postReceiverUrl);
 
 			File file = new File(filePath);
-			FileBody fileBody = new FileBody(file);
+			Calendar c = Calendar.getInstance(); 
+			int hour = c.get(Calendar.HOUR);
+			int minute = c.get(Calendar.MINUTE);
+			int second = c.get(Calendar.SECOND);
+			int milli = c.get(Calendar.MILLISECOND);
+			String uploadName = "" + hour + minute + second + milli + ".png";
+			FileBody fileBody = new FileBody(file, ContentType.MULTIPART_FORM_DATA, uploadName);
 
-//			MultipartEntity reqEntity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE);
-//			MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-//			builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
 			CustomMultiPartEntity multipartContent = new CustomMultiPartEntity(new ProgressListener()
 			{
 				@Override
