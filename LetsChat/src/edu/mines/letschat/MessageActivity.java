@@ -310,6 +310,8 @@ public class MessageActivity extends Activity {
 				filePath = cursor.getString(columnIndex);
 				Log.v("log","filePath is : " + filePath); 
 				EditText text = (EditText)findViewById(R.id.typingArea);
+				Button b = (Button) findViewById(R.id.sendMessage);
+				b.setEnabled(true);
 				InputStream inputStream;
 				try {
 					inputStream = getContentResolver().openInputStream(selectedImage);

@@ -81,7 +81,9 @@ public class AwesomeAdapter extends BaseAdapter {
             dr.setBounds(0, 0, dr.getIntrinsicWidth(), dr.getIntrinsicHeight()); 
             ImageSpan span = new ImageSpan(dr, ImageSpan.ALIGN_BASELINE); 
             ss.setSpan(span, 0, 3, Spannable.SPAN_INCLUSIVE_EXCLUSIVE); 
-            holder.message.append("\n");
+            if (message.message.length() != 0) {
+            	holder.message.append("\n");
+            }
             holder.message.append("\n");
             holder.message.append(ss);
 //			ImageSpan imageSpan = new ImageSpan(mContext.getResources().getDrawable(R.drawable.test)); //Find your drawable.

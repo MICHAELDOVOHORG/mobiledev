@@ -41,8 +41,9 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight=".15"
-            android:onClick="sendMessage"
-            android:background="@drawable/ic_action_send" />
+            android:onClick="sendMessage" 
+            android:text=">"/>
+            <!-- android:background="@drawable/ic_action_send" -->
     </LinearLayout>
 
     <ListView
