@@ -16,8 +16,16 @@
 
 package edu.mines.letschat;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collections;
+import org.apache.http.util.ByteArrayBuffer;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import android.app.IntentService;
 import android.app.NotificationManager;
@@ -25,7 +33,9 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
@@ -105,6 +115,11 @@ public class GcmIntentService extends IntentService {
         		Log.v(TAG, picture);
         		Conversation convo = new Conversation(getApplicationContext(), senderID, recipientID, message, false, picture);
     			convo.save();
+    			
+    			if (!picture.isEmpty()) {
+    				new DownloadImage(picture).execute();
+    			}
+    			
         		/*send broadcast */
         		sendBroadcast(resultBroadCastIntent);
             }
@@ -178,5 +193,81 @@ public class GcmIntentService extends IntentService {
         mBuilder.setContentIntent(contentIntent);
         mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
 //        AwesomeAdapter.animate = true;
+    }
+    
+class DownloadImage extends AsyncTask<String, String, String> {
+		
+//		ProgressDialog pd;
+		String picture;
+	
+		public DownloadImage(String picture) {
+			this.picture = picture;
+		}
+		
+		@Override
+		protected void onPreExecute() {
+//			pd = new ProgressDialog(MainActivity.this);
+//			pd.setCancelable(false);
+//			pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+//			pd.show();
+		}
+        
+		@Override
+		protected String doInBackground(String... params) {
+			
+			try {
+		        File dir = new File(Environment.getExternalStorageDirectory().getPath() + File.separator + "Talkie Talk");
+		        if(dir.exists() == false){
+		             dir.mkdir();  
+		        }
+
+		        URL url = new URL("http://justacomputerscientist.com/mobile/images/" + picture);
+		        File file = new File(dir,picture);
+
+		        long startTime = System.currentTimeMillis();
+		        Log.d("DownloadManager" , "download url:" +url);
+		        Log.d("DownloadManager" , "download file name:" + picture);
+
+		        URLConnection uconn = url.openConnection();
+//		        pd.setMax(uconn.getContentLength());
+//		        uconn.setReadTimeout(URLCoTIMEOUT_CONNECTION);
+//		        uconn.setConnectTimeout(TIMEOUT_SOCKET);
+
+		        InputStream is = uconn.getInputStream();
+		        BufferedInputStream bufferinstream = new BufferedInputStream(is);
+
+		        ByteArrayBuffer baf = new ByteArrayBuffer(5000);
+		        int current = 0;
+		        while((current = bufferinstream.read()) != -1){
+		            baf.append((byte) current);
+//		            Log.v("Download progress", "" + baf.length());
+////		            pd.setProgress(pd.getMax() + current);
+//		            pd.setProgress(baf.length());
+		        }
+
+		        FileOutputStream fos = new FileOutputStream( file);
+		        fos.write(baf.toByteArray());
+		        fos.flush();
+		        fos.close();
+		        Log.d("DownloadManager" , "download ready in" + ((System.currentTimeMillis() - startTime)/1000) + "sec");
+		        Log.d("DownloadManager" , "download ready in" + dir.getPath());
+		        int dotindex = picture.lastIndexOf('.');
+		        if(dotindex>=0){
+//		            fileName = "turkey.jpg".substring(0,dotindex);
+		        }
+
+		    }
+		    catch(IOException e) {
+		        Log.d("DownloadManager" , "Error:" + e);
+		        e.printStackTrace();
+		    }
+			return null;
+		}       
+		
+		@Override
+		protected void onPostExecute(String result)
+		{
+//			pd.dismiss();
+		}
     }
 }

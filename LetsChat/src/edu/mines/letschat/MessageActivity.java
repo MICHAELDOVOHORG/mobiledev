@@ -24,6 +24,7 @@ import org.apache.http.util.EntityUtils;
 import edu.mines.letschat.CustomMultiPartEntity.ProgressListener;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.NotificationManager;
@@ -148,11 +149,17 @@ public class MessageActivity extends Activity {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1,
 					int arg2, long arg3) {
-				Intent intent = new Intent(Intent.ACTION_VIEW);
-//				intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-//				intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-				intent.setDataAndType(Uri.parse("file:///mnt/sdcard/image/test.jpg"),"image/*");
-				startActivity(intent);
+				if (messages.get(arg2).hasPicture()) {
+					Intent intent = new Intent(Intent.ACTION_VIEW);
+//					intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+//					intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+					if (messages.get(arg2).isMine()) {
+						intent.setDataAndType(Uri.parse("file:///" + messages.get(arg2).picture),"image/*");
+					} else {
+						intent.setDataAndType(Uri.parse("file:///" + Environment.getExternalStorageDirectory().getPath() + File.separator + "Talkie Talk/" + messages.get(arg2).picture),"image/*");
+					}
+					startActivity(intent);
+				}
 			}
 		});
 		conversationList.setOnItemLongClickListener(new OnItemLongClickListener() {
@@ -251,7 +258,11 @@ public class MessageActivity extends Activity {
 
 		Log.v(TAG, listOfConverstations.size() + "");
 		for (Conversation c : listOfConverstations) {
-			messages.add(new Message(c.message, c.sent, c.picture));
+			if (c.picture == null) {
+				messages.add(new Message(c.message, c.sent, ""));
+			} else {
+				messages.add(new Message(c.message, c.sent, c.picture));
+			}
 		}
 		AwesomeAdapter ad = (AwesomeAdapter) conversationList.getAdapter();
 		ad.notifyDataSetChanged();
@@ -472,9 +483,9 @@ public class MessageActivity extends Activity {
 					instream.close();
 					Log.v("RESULT", result);
 					if (!hasPicture) {
-						uploadName = "";
+						filePath = "";
 					}
-					Conversation convo = new Conversation(MessageActivity.this, senderID, recipientID, message, true, uploadName);
+					Conversation convo = new Conversation(MessageActivity.this, senderID, recipientID, message, true, filePath);
 					convo.save();
 					//    				jsonarray = new JSONArray(result);
 					//

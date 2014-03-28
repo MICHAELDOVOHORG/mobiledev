@@ -12,10 +12,13 @@ public class Message {
 	}
 	
 	public boolean isMine() {
-		if (sent) {
-			return true;
-		} else {
+		return sent;
+	}
+	
+	public boolean hasPicture() {
+		if (picture == null || picture.isEmpty()) {
 			return false;
 		}
+		return true;
 	}
 }
